@@ -1,6 +1,6 @@
 <template>
     <div class="fixed bg-black/50 top-0 left-0 w-full h-screen flex justify-center items-center overflow-auto z-20">
-        <div class="rounded-md w-full md:w-1/2 bg-white flex flex-col p-1 mt-96">
+        <div class="rounded-md w-full md:w-1/2 bg-white flex flex-col p-1">
             <div class="text-right flex justify-between items-center flex-row p-2">
                 <div></div>
                 <h1 class="font-bold text-xl">Create Post</h1>
@@ -15,15 +15,22 @@
                     <i class="bx bx-world"></i>
                 </div>
             </div>
-            <div contenteditable="true" ref="textarea" class="outline-none px-2 z-10 min-h-[8rem]" @input="({target}) => description = target.innerText"></div>
-            <div v-if="images.length" class="grid gap-1" :class="{'grid-cols-1 grid-rows-1': images.length == 1, 'grid-cols-2 grid-rows-1': images.length == 2, 'grid-cols-2 grid-rows-2': images.length == 3, 'grid-cols-2 grid-rows-2': images.length == 4}">
-                <img v-for="(image, i) in images" :key="i" :src="image.src" :alt="image.name" class="w-full overflow-hidden aspect-square object-cover object-top" :class="{'col-span-2': i == 0 && image.length == 3}">
+            <div class="min-h-[8rem] max-h-96 overflow-y-auto">
+                <div contenteditable="true" ref="textarea" class="outline-none px-2 z-10 min-h-[8rem]" @input="({target}) => description = target.innerText"></div>
+                <div v-if="images.length" class="grid gap-1" :class="{'grid-cols-1 grid-rows-1': images.length == 1, 'grid-cols-2 grid-rows-1': images.length == 2, 'grid-cols-2 grid-rows-2': images.length == 3, 'grid-cols-2 grid-rows-2': images.length == 4}">
+                    <div class="relative" v-for="(image, i) in images" :key="i" :class="{'col-span-2': i == 0 && images.length == 3}">
+                        <button class="absolute top-0 right-0 px-1 bg-white rounded-full m-1" @click="images.splice(i, 1)">
+                            <i class="bx bx-x text-xl rounded-full"></i>
+                        </button>
+                        <img :src="renderImage(image)" :alt="image.name" class="w-full" :class="{'aspect-square object-cover object-top': images.length > 1}" draggable="false">
+                    </div>
+                </div>
             </div>
             <label for="imagesInput" class="w-max m-4 rounded-sm bg-black/50 hover:bg-black/75 transition-all duration-150 py-1 px-2 text-white cursor-pointer">
                 <i class='bx bxs-file-image'></i>
                 Add Images Up To 4 Images
             </label>
-            <input type="file" multiple name="images[]" accept=".jpg,.jpeg,.png,.webp" id="imagesInput" class="hidden" @input="handleInputFile">
+            <input type="file" ref="imagesInput" multiple name="images[]" accept=".jpg,.jpeg,.png,.webp" id="imagesInput" class="hidden" @input="handleInputFile">
             <button class="mx-auto w-1/2 py-2 text-white text-xl font-semibold bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm" @click="handlePost">
                 Post
             </button>
@@ -34,42 +41,54 @@
 const emit = defineEmits(["newPost", "postingStatus", "closeCreatePostStatus"])
 const toast = useToast();
 
+const textarea = ref(null);
 const description = ref("");
 const images = ref([]);
+const imagesInput = ref(null);
+
+const renderImage = file => URL.createObjectURL(file);
 
 const handleInputFile = ({target}) => {
-    if (target.files.length) {
-        if (target.files.length > 4) {
+    let files = [...target.files];
+    if (files.length) {
+        if (files.length > 4) {
             toast.value.push("Cannot select images more than 4!");
-            target.value = "";
+            files.splice(4, files.length - 1);
         }
 
         const allowed = ["png", "jpg", "jpeg", "webp"]
-        for (let file of target.files) {
-            if (!allowed.includes(file.type.split("/")[1])) {
-                toast.value.push("Please Select An Photo!")
-                target.value = "";
+        for (let file in files) {
+            if (!allowed.includes(files[file].type.split("/")[1])) {
+                toast.value.push("Please Select An Photo!");
+                files = [];
+                images.value = [];
                 return;
             }
         }
 
-        images.value = useUrlImage(target.files);
+        images.value = files;
     }
 }
 
 const handlePost = async () => {
+    emit("closeCreatePostStatus");
     emit("postingStatus", true);
-    const { data, pending, error, refresh } = await createPost({
-        description
-    });
+    let formData = new FormData();
+    formData.append("description", description.value);
+    for (let file of images.value) {
+        formData.append("images", file)
+    }
+    const { data, pending, error, refresh } = await createPost(formData);
     if (error.value) {
         toast.value = [...toast.value, "Something Went Wrong"];
     } else {
-        console.log("aku enggak error");
         toast.value = [...toast.value, "Your post has been published"];
         emit("newPost", data.value.post);
+        imagesInput.value = "";
+        images.value = [];
+        description.value = "";
+        textarea.value.innerText = "";
     }
     emit("postingStatus", false);
-    emit("closeCreatePostStatus");
 }
 </script>

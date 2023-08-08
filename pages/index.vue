@@ -21,6 +21,7 @@
             <div v-else-if="!posts.length" class="flex justify-center items-center flex-col bg-white shadow-md h-96">
                 <i class='bx bx-check text-7xl'></i>
                 <h1>It looks like you have been see all posts!</h1>
+                <button @click="refresh" class="text-white bg-black/50 hover:bg-black/75 px-2 py-1 transition-all duration-300">Refresh</button>
             </div>
             <Post v-else v-for="post in posts" :key="post._id" :post="post" @delete-post="id => posts = posts.filter(v => v._id != id)" />
         </div>

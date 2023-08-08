@@ -5,8 +5,17 @@
 @tailwind utilities;
 
 @layer base {
+    ::-webkit-scrollbar, ::-webkit-scrollbar-track, ::-webkit-scrollbar-track-piece {
+        @apply bg-transparent w-1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        @apply bg-black/50;
+    }
+
     html {
-        font-family: 'Poppins', 'Roboto', sans-serif
+        font-family: 'Poppins', 'Roboto', sans-serif;
+        -webkit-tap-highlight-color: transparent;
     }
 
     input {

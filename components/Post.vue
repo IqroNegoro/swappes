@@ -9,7 +9,7 @@
                 </div>
             </div>
             <div class="relative">
-                <button class="text-2xl" :class="{'bg-black/10': showPostMenu}" @click="showPostMenu = !showPostMenu">
+                <button class="text-2xl pt-1 px-2 rounded-full" :class="{'bg-black/10': showPostMenu}" @click="showPostMenu = !showPostMenu">
                     <i class='bx bx-dots-horizontal-rounded'></i>
                 </button>
                 <div v-if="showPostMenu" class="absolute top-full right-0 flex flex-col items-start w-48 bg-white z-10 rounded-lg shadow-md" @click="showPostMenu = false">
@@ -37,7 +37,7 @@
             </button>
         </div>
         <div class="grid gap-1" :class="{'grid-cols-1 grid-rows-1': post.images.length == 1, 'grid-cols-2 grid-rows-1': post.images.length == 2, 'grid-cols-2 grid-rows-2': post.images.length == 3, 'grid-cols-2 grid-rows-2': post.images.length == 4}">
-            <img v-for="(images, i) in post.images" :key="images.discordId" :src="images.images" alt="attachments" class="w-full overflow-hidden aspect-square object-cover object-top" :class="{'col-span-2': i == 0 && post.images.length == 3}">
+            <img v-for="(images, i) in post.images" :key="images.discordId" :src="images.images" alt="attachments" class="w-full overflow-hidden" :class="{'aspect-square object-cover object-top': post.images.length > 1, 'col-span-2': i == 0 && post.images.length == 3}" loading="lazy">
         </div>
         <div class="flex flex-row justify-between p-2 border-y border-black/10">
             <button class="action-post">
@@ -59,13 +59,11 @@
 import moment from "moment";
 const emit = defineEmits(["deletePost"]);
 const { post } = defineProps(["post"]);
-console.log(post.images);
 const toast = useToast();
 
 const handleDeletePost = async () => {
     const { data, error } = await deletePost(post._id);
     if (error.value) {
-        console.log(error.value)
         toast.value = [...toast.value, "Something Wrong"];
     } else {
         toast.value = [...toast.value, "Success Delete Post"];
