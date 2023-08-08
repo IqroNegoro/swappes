@@ -1,3 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&family=Roboto&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    html {
+        font-family: 'Poppins', 'Roboto', sans-serif
+    }
+
+    input {
+        @apply outline-none;
+    }
+}
+
+@layer components {
+    .action-post {
+        @apply w-full flex justify-center items-center gap-2 text-lg font-semibold transition-all duration-300 hover:bg-black/10 py-1 rounded-md;
+    }
+
+    .hover-bg {
+        @apply transition-all duration-300 hover:bg-black/10
+    }
+
+    .triangle {
+        clip-path: polygon(100% 0, 0% 100%, 100% 100%);
+    }
+}

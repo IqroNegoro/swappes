@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: [
     "@pinia/nuxt",
-    "@nuxtjs/tailwindcss"
+    "@nuxtjs/tailwindcss",
   ],
   app: {
     head: {
@@ -17,8 +17,11 @@ export default defineNuxtConfig({
   pinia: {
     autoImports: [
       "defineStore",
-      "acceptHMRUpdate"
+      "acceptHMRUpdate",
     ]
+  },
+  imports: {
+    dirs: ['stores']
   },
   tailwindcss: {
     cssPath: '~/assets/css/tailwind.css'
