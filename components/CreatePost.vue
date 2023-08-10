@@ -1,10 +1,11 @@
 <template>
     <div class="fixed bg-black/50 top-0 left-0 w-full h-screen flex justify-center items-center overflow-auto z-20">
-        <div class="rounded-md w-full md:w-1/2 bg-white flex flex-col p-1">
+        <div class="rounded-md w-full md:w-1/2 bg-white flex flex-col p-1 relative">
+            <div class="absolute top-0 left-0 w-full h-full bg-white/50 z-30" v-if="pending"></div>
             <div class="text-right flex justify-between items-center flex-row p-2">
                 <div></div>
                 <h1 class="font-bold text-xl">Create Post</h1>
-                <button class="px-1 hover-bg rounded-full" @click="$emit('closeCreatePostStatus')">
+                <button class="px-1 hover-bg rounded-full relative z-40" @click="$emit('closeCreatePostStatus')">
                     <i class="bx bx-x text-3xl rounded-full"></i>
                 </button>
             </div>
@@ -17,7 +18,7 @@
             </div>
             <div class="min-h-[8rem] max-h-96 overflow-y-auto">
                 <div contenteditable="true" ref="textarea" class="outline-none px-2 z-10 min-h-[8rem]" @input="({target}) => description = target.innerText"></div>
-                <div v-if="images.length" class="grid gap-1" :class="{'grid-cols-1 grid-rows-1': images.length == 1, 'grid-cols-2 grid-rows-1': images.length == 2, 'grid-cols-2 grid-rows-2': images.length == 3, 'grid-cols-2 grid-rows-2': images.length == 4}">
+                <div v-if="images.length" class="grid gap-1 rounded-xl overflow-hidden" :class="{'grid-cols-1 grid-rows-1': images.length == 1, 'grid-cols-2 grid-rows-1': images.length == 2, 'grid-cols-2 grid-rows-2': images.length == 3, 'grid-cols-2 grid-rows-2': images.length == 4}">
                     <div class="relative" v-for="(image, i) in images" :key="i" :class="{'col-span-2': i == 0 && images.length == 3}">
                         <button class="absolute top-0 right-0 px-1 bg-white rounded-full m-1" @click="images.splice(i, 1)">
                             <i class="bx bx-x text-xl rounded-full"></i>
@@ -31,7 +32,7 @@
                 Add Images Up To 4 Images
             </label>
             <input type="file" ref="imagesInput" multiple name="images[]" accept=".jpg,.jpeg,.png,.webp" id="imagesInput" class="hidden" @input="handleInputFile">
-            <button class="mx-auto w-1/2 py-2 text-white text-xl font-semibold bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm" @click="handlePost">
+            <button class="mx-auto w-1/2 py-2 text-white text-xl font-semibold bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm" :disabled="pending" @click="handlePost">
                 Post
             </button>
         </div>
@@ -40,7 +41,7 @@
 <script setup>
 const emit = defineEmits(["newPost", "postingStatus", "closeCreatePostStatus"])
 const toast = useToast();
-
+let { data, pending, error, refresh } = useFetch();
 const textarea = ref(null);
 const description = ref("");
 const images = ref([]);
@@ -71,6 +72,7 @@ const handleInputFile = ({target}) => {
 }
 
 const handlePost = async () => {
+    toast.value.push("Posting your post...");
     emit("closeCreatePostStatus");
     emit("postingStatus", true);
     let formData = new FormData();
@@ -78,11 +80,11 @@ const handlePost = async () => {
     for (let file of images.value) {
         formData.append("images", file)
     }
-    const { data, pending, error, refresh } = await createPost(formData);
+    ({ data, pending, error, refresh } = await createPost(formData));
     if (error.value) {
-        toast.value = [...toast.value, "Something Went Wrong"];
+        toast.value.push("Something Went Wrong");
     } else {
-        toast.value = [...toast.value, "Your post has been published"];
+        toast.value.push("Your post has been published");
         emit("newPost", data.value.post);
         imagesInput.value = "";
         images.value = [];

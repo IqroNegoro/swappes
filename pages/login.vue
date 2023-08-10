@@ -39,12 +39,19 @@ const handleLogin = async () => {
         return;
     }
 
-    console.log(data.value)
     user.$patch({
         ...data.value,
         authenticated: true
     })
+
+    return navigateTo("/");
 }
+
+if (!await refreshLogin()) navigateTo("/");
+
+definePageMeta({
+    layout: ""
+})
 
 useHead({
     title: "Login To Swappes"

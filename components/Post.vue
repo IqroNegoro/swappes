@@ -64,9 +64,9 @@ const toast = useToast();
 const handleDeletePost = async () => {
     const { data, error } = await deletePost(post._id);
     if (error.value) {
-        toast.value = [...toast.value, "Something Wrong"];
+        toast.value.push("Something Wrong");
     } else {
-        toast.value = [...toast.value, "Success Delete Post"];
+        toast.value.push("Success Delete Post");
         emit("deletePost", post._id)
     }
 }

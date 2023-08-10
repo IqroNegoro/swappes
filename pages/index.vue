@@ -1,37 +1,33 @@
 <template>
-    <div class="grid grid-rows-1 grid-cols-1 lg:grid-cols-3 mt-8">
-        <div class="max-lg:hidden">
-            
+    <div class="grid grid-cols-1 grid-flow-row gap-2">
+        <div class="rounded-md shadow-sm p-4 flex gap-4">
+            <img src="https://w0.peakpx.com/wallpaper/981/51/HD-wallpaper-video-game-arknights-irene-arknights.jpg" alt="" class="rounded-full w-12 h-12 object-cover">
+            <button class="rounded-full w-full text-left bg-black/10 px-4 font-light outline-none" @click="createPostStatus = true">
+                Create post...
+            </button>
         </div>
-        <div class="grid grid-cols-1 grid-flow-row gap-2">
-            <div class="rounded-md shadow-sm p-4 flex gap-4">
-                <img src="https://w0.peakpx.com/wallpaper/981/51/HD-wallpaper-video-game-arknights-irene-arknights.jpg" alt="" class="rounded-full w-12 h-12 object-cover">
-                <button class="rounded-full w-full text-left bg-black/10 px-4 font-light outline-none" @click="createPostStatus = true">
-                    Create post...
-                </button>
-            </div>
-            <div class="shadow-sm p-2 animate-pulse" v-if="postingStatus">
-                <h1>Posting...</h1>
-            </div>
-            <PostSkeleton v-if="pendingPosts" />
+        <button class="mx-auto w-1/2 py-2 text-white text-md font-semibold bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm" :disabled="pending" @click="refresh">
+            Refresh New Post
+        </button>
+        <div class="shadow-sm p-2 animate-pulse" v-if="postingStatus">
+            <h1>Posting...</h1>
+        </div>
+        <PostSkeleton v-if="pending" />
             <div v-else-if="error" class="flex flex-col justify-center items-center">
-                Something Went Wrong
-                <button @click="refresh" class="text-white bg-black/50 hover:bg-black/75 px-2 py-1 transition-all duration-300">Try Again</button>
-            </div>
-            <div v-else-if="!posts.length" class="flex justify-center items-center flex-col bg-white shadow-md h-96">
-                <i class='bx bx-check text-7xl'></i>
-                <h1>It looks like you have been see all posts!</h1>
-                <button @click="refresh" class="text-white bg-black/50 hover:bg-black/75 px-2 py-1 transition-all duration-300">Refresh</button>
-            </div>
-            <Post v-else v-for="post in posts" :key="post._id" :post="post" @delete-post="id => posts = posts.filter(v => v._id != id)" />
+            Something Went Wrong
+            <button @click="refresh" class="text-white bg-black/50 hover:bg-black/75 px-2 py-1 transition-all duration-300">Try Again</button>
         </div>
-        <div class="max-lg:hidden">
+        <div v-else-if="!posts.length" class="flex justify-center items-center flex-col bg-white shadow-md h-96">
+            <i class='bx bx-check text-7xl'></i>
+            <h1>It looks like you have been see all posts!</h1>
+            <button @click="refresh" class="text-white bg-black/50 hover:bg-black/75 px-2 py-1 transition-all duration-300">Refresh</button>
         </div>
+        <Post v-else v-for="post in posts" :key="post._id" :post="post" @delete-post="id => posts = posts.filter(v => v._id != id)" />
         <CreatePost v-show="createPostStatus" @new-post="post => posts.unshift(post)" @close-create-post-status="createPostStatus = false" @posting-status="status => postingStatus = status" />
     </div>
 </template>
 <script setup>
-const { data: posts, pending: pendingPosts, error, refresh } = await getPosts();
+const { data: posts, pending, error, refresh } = await getPosts();
 const createPostStatus = ref(false);
 const postingStatus = ref(false);
 

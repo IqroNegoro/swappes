@@ -3,7 +3,6 @@ export const userStore = defineStore("user", ({
         _id: '',
         name: '',
         email: '',
-        token: '',
         authenticated: false
     })
 }))
