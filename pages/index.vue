@@ -1,7 +1,7 @@
 <template>
     <div class="grid grid-cols-1 grid-flow-row gap-2">
         <div class="rounded-md shadow-sm p-4 flex gap-4">
-            <img src="https://w0.peakpx.com/wallpaper/981/51/HD-wallpaper-video-game-arknights-irene-arknights.jpg" alt="" class="rounded-full w-12 h-12 object-cover">
+            <img :src="user.avatar?.url" alt="" class="rounded-full w-12 h-12 object-cover">
             <button class="rounded-full w-full text-left bg-black/10 px-4 font-light outline-none" @click="createPostStatus = true">
                 Create post...
             </button>
@@ -22,12 +22,14 @@
             <h1>It looks like you have been see all posts!</h1>
             <button @click="refresh" class="text-white bg-black/50 hover:bg-black/75 px-2 py-1 transition-all duration-300">Refresh</button>
         </div>
-        <Post v-else v-for="post in posts" :key="post._id" :post="post" @delete-post="id => posts = posts.filter(v => v._id != id)" />
+        <Post v-else v-for="post in posts" :key="post._id" :post="post" @delete-post="id => posts = posts.filter(v => v._id != id)" @like-post="likes => posts.find(v => v._id == likes._id).likes = likes.likes" />
         <CreatePost v-show="createPostStatus" @new-post="post => posts.unshift(post)" @close-create-post-status="createPostStatus = false" @posting-status="status => postingStatus = status" />
     </div>
 </template>
 <script setup>
+const user = userStore();
 const { data: posts, pending, error, refresh } = await getPosts();
+
 const createPostStatus = ref(false);
 const postingStatus = ref(false);
 

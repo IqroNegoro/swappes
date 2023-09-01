@@ -7,8 +7,16 @@
             <button class="w-full bg-black/50 hover:bg-black/75 rounded-sm text-white py-2 disabled:bg-black/25 disabled:cursor-not-allowed" :disabled="pending" @click.prevent="handleLogin" type="submit" @submit.prevent="handleLogin">
                 Log in
             </button>
+            <p>
+                Doesn't have account? 
+                <NuxtLink :to="{name: 'register'}" class="text-blue-500">
+                    register
+                </NuxtLink>
+                now!
+            </p>
             <div class="absolute bottom-0 left-0 w-full h-32 bg-black/50 triangle"></div>
        </form>
+       <Toast />
     </div>
 </template>
 <script setup>
@@ -50,7 +58,7 @@ const handleLogin = async () => {
 if (!await refreshLogin()) navigateTo("/");
 
 definePageMeta({
-    layout: ""
+    layout: false
 })
 
 useHead({

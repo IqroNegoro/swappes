@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     autoImports: [
       "defineStore",
       "acceptHMRUpdate",
+      "storeToRefs"
     ]
   },
   imports: {

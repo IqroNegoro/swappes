@@ -21,11 +21,18 @@
     input {
         @apply outline-none;
     }
+
+    [contenteditable][placeholder]:empty:before {
+        content: attr(placeholder);
+        position: absolute;
+        color: gray;
+        background-color: transparent;
+      }
 }
 
 @layer components {
     .action-post {
-        @apply w-full flex justify-center items-center gap-2 text-lg font-semibold transition-all duration-300 hover:bg-black/10 py-1 rounded-md;
+        @apply w-full flex justify-center items-center gap-2 text-base  font-semibold transition-all duration-300 hover:bg-black/10 py-1 rounded-sm;
     }
 
     .hover-bg {
@@ -34,5 +41,9 @@
 
     .triangle {
         clip-path: polygon(100% 0, 0% 100%, 100% 100%);
+    }
+
+    .button {
+        @apply mx-auto w-auto px-3 py-1 text-white text-xl font-semibold bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm text-center;
     }
 }

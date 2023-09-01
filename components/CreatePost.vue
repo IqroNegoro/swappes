@@ -10,9 +10,9 @@
                 </button>
             </div>
             <div class="flex gap-2 p-4">
-                <img src="https://w0.peakpx.com/wallpaper/981/51/HD-wallpaper-video-game-arknights-irene-arknights.jpg" alt="" class="rounded-full w-10 h-10 object-cover"> 
+                <img :src="user.avatar?.url" alt="" class="rounded-full w-10 h-10 object-cover"> 
                 <div>
-                    <p class="text-sm font-bold">Iqro Negoro</p>
+                    <p class="text-sm font-bold">{{ user.name }}</p>
                     <i class="bx bx-world"></i>
                 </div>
             </div>
@@ -31,7 +31,7 @@
                 <i class='bx bxs-file-image'></i>
                 Add Images Up To 4 Images
             </label>
-            <input type="file" ref="imagesInput" multiple name="images[]" accept=".jpg,.jpeg,.png,.webp" id="imagesInput" class="hidden" @input="handleInputFile">
+            <input type="file" multiple name="images[]" accept=".jpg,.jpeg,.png,.webp" id="imagesInput" class="hidden" @input="handleInputFile">
             <button class="mx-auto w-1/2 py-2 text-white text-xl font-semibold bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm" :disabled="pending" @click="handlePost">
                 Post
             </button>
@@ -39,13 +39,13 @@
     </div>
 </template>
 <script setup>
+const user = userStore();
 const emit = defineEmits(["newPost", "postingStatus", "closeCreatePostStatus"])
 const toast = useToast();
 let { data, pending, error, refresh } = useFetch();
 const textarea = ref(null);
 const description = ref("");
 const images = ref([]);
-const imagesInput = ref(null);
 
 const renderImage = file => URL.createObjectURL(file);
 
@@ -86,7 +86,6 @@ const handlePost = async () => {
     } else {
         toast.value.push("Your post has been published");
         emit("newPost", data.value.post);
-        imagesInput.value = "";
         images.value = [];
         description.value = "";
         textarea.value.innerText = "";
