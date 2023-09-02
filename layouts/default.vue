@@ -6,6 +6,9 @@
             <slot />
             <div class="max-lg:hidden"></div>
         </div>
-        <Toast />
+        <Toast v-if="toast.length" />
     </div>
 </template>
+<script setup>
+const toast = useToast();
+</script>

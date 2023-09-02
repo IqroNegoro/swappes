@@ -11,6 +11,3 @@
 <script setup>
 const toast = useToast();
 </script>
-<style scoped>
-
-</style>

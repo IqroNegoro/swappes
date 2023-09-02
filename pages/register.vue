@@ -37,9 +37,7 @@ const handleRegister = async () => {
             }
             
             if (error.value.data.errors) {
-                error.value.data.errors.forEach(v => {
-                    toast.value.push(v.msg);
-                })
+                toast.value = error.value.data
             }
         } else {
             toast.value.push(`Something Went Wrong (code: ${error.value.statusCode})`)

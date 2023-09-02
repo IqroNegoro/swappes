@@ -32,7 +32,7 @@
 
 @layer components {
     .action-post {
-        @apply w-full flex justify-center items-center gap-2 text-base  font-semibold transition-all duration-300 hover:bg-black/10 py-1 rounded-sm;
+        @apply w-full flex justify-center items-center gap-2 text-base font-semibold transition-all duration-300 hover:bg-black/10 py-1 rounded-sm;
     }
 
     .hover-bg {
@@ -45,5 +45,13 @@
 
     .button {
         @apply mx-auto w-auto px-3 py-1 text-white text-xl font-semibold bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm text-center;
+    }
+
+    .remove-scrollbar::-webkit-scrollbar {
+        @apply hidden;
+    }
+
+    .rounded-scrollbar::-webkit-scrollbar {
+        @apply overflow-hidden rounded-lg;
     }
 }

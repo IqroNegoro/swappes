@@ -18,7 +18,7 @@ export const deletePost = async id => await useApi(`posts/${id}`, {
 export const getCommentsPost = async id => await useApi(`posts/${id}/comments`, {
     transform: res => res.data,
     default: () => [],
-    key: "get-comment-post"
+    key: `get-comment-post-${id}`
 })
 
 export const likePost = async id => await useApi(`posts/${id}/likes`, {
@@ -31,6 +31,6 @@ export const likePost = async id => await useApi(`posts/${id}/likes`, {
 export const commentPost = async (id, comment) => await useApi(`posts/${id}/comments`, {
     method: "POST",
     body: comment,
-    trasnform: res => res.data,
+    transform: res => res.data,
     key: `comment-post-${id}`
 })
