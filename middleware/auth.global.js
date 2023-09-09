@@ -1,5 +1,8 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
     const user = userStore();
+    if (process.client) {
+        document.documentElement.classList.add("dark")
+    }
     let whitelist = ["login", "register"];
     let whitelistPage = ["users-id"];
     console.log(whitelist.includes(to.name) || whitelist.includes(from.name))

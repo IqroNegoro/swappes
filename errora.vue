@@ -4,6 +4,7 @@
         <h1 v-if="error.statusCode != 500" class="text-7xl">{{ error.message }}!</h1>
         <h1 v-else>Something wrong, try again later</h1>
         {{ error.message }}
+        {{ error.stack }}
         <NuxtLink :to="user.authenticated ? '/' : '/login'" class="button">
             Back
         </NuxtLink>

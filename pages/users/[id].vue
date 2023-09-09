@@ -1,7 +1,33 @@
 <template>
-    <div class="w-full flex justify-center flex-col items-center bg-black/5">
-        <div class="rounded-b-md relative flex justify-center items-center flex-col w-full h-72 bg-cover bg-top bg-no-repeat bg-[linear-gradient(to_bottom,rgba(0,0,0,0),rgba(0,0,0,0.75)),url('https://www.hdwallpapers.in/download/irene_female_anime_hd_arknights-HD.jpg')]"></div>
-        <div class="w-full flex flex-col md:grid grid-cols-3 grid-rows-1 justify-between items-center bg-white gap-4 px-8">
+<div class="w-full flex justify-center flex-col items-center">
+    <div v-if="showFullBanner" class="fixed top-0 left-0 flex justify-center items-center w-full h-screen bg-black/50 z-50 cursor-pointer" @click="showFullBanner = false">
+        <img v-if="userData.banner?.url && !banner" :src="userData.banner?.url">
+        <img v-else-if="!banner" :src="userData.banner?.url">
+        <img v-else :src="renderImage(banner)">
+    </div>
+        <div class="cursor-pointer rounded-b-md relative flex justify-center items-center flex-col w-full">
+            <div v-if="!userData.banner?.url && !banner" class="w-full h-48 bg-gradient-to-b from-transparent to-white/25"></div>
+            <img v-else-if="!banner" :src="userData.banner?.url" alt="banner" class="object-top object-cover w-full max-h-96">
+            <img v-else :src="renderImage(banner)" alt="" class="object-top object-cover w-full max-h-96">
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black/25" @click.self="showFullBanner = true"></div>
+            <div class="absolute right-0 bottom-0 m-4 flex flex-col gap-2">
+                <label for="bannerInput" v-if="user._id == userData._id && !banner" class="cursor-pointer text-white flex justify-center items-center gap-2 rounded-md bg-black/30 hover:bg-black/40 duration-150 p-2">
+                    <i class="bx bx-camera"></i>
+                    <p class="max-md:hidden">Upload Banner</p>
+                </label>
+                <button v-else class="cursor-pointer text-white flex justify-center items-center gap-2 rounded-md bg-black/30 hover:bg-black/40 duration-150 p-2" @click="handleBanner" :disabled="pendingBanner">
+                    <i v-if="pendingBanner" class='bx bx-loader-alt bx-spin'></i>
+                    <i v-else class="bx bx-upload"></i>
+                    <p class="max-md:hidden">Upload Banner</p>
+                </button>
+                <button v-if="banner" class="cursor-pointer text-white flex justify-center items-center gap-2 rounded-md bg-black/30 hover:bg-black/40 duration-150 p-2" @click="banner = null" :disabled="pendingBanner">
+                    <i class="bx bx-x"></i>
+                    <p class="max-md:hidden">Cancel</p>
+                </button>
+                <input type="file" accept=".jpg,.jpeg,.webp,.png" id="bannerInput" class="hidden" @input="handleBannerFilter">
+            </div>
+        </div>
+        <div class="dark:bg-dark-primary dark:text-white w-full flex flex-col md:grid grid-cols-3 grid-rows-1 justify-between items-center bg-white gap-4 px-8">
             <div class="max-md:-translate-y-28 flex justify-center items-center text-center gap-4 font-semibold">
                 <p>
                     {{ posts.posts.length }} <br>
@@ -18,7 +44,7 @@
             </div>
             <div class="-translate-y-28 max-md:order-first text-center">
                 <div class="relative">
-                    <img v-if="!avatar" :src="userData.avatar.url" alt="" class="rounded-full w-48 h-48 object-cover mx-auto object-center bg-white">
+                    <img v-if="!avatar" :src="userData.avatar?.url" alt="" class="rounded-full w-48 h-48 object-cover mx-auto object-center bg-white">
                     <img v-else :src="renderImage(avatar)" class="rounded-full w-48 h-48 mx-auto object-cover object-center bg-white">
                     <label v-if="user._id == userData._id" for="avatarInput" class="w-48 h-48 bg-black/25 cursor-pointer opacity-0 hover:opacity-100 absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex justify-center items-center rounded-full transition-all duration-150">
                         <i class="bx bxs-camera-plus text-white text-4xl"></i>
@@ -26,14 +52,14 @@
                     <input type="file" accept=".jpg,.jpeg,.webp,.png" id="avatarInput" class="hidden" @input="handleAvatarFilter">
                     <Transition name="upload">
                         <div v-if="avatar" class="absolute left-3/4 top-1/2 flex flex-col gap-2 max-md:text-xs">
-                            <button class="rounded-md w-max bg-white p-2 shadow-lg flex justify-center items-center gap-2 font-semibold" @click="handleAvatar" :disabled="pendingAvatar">
+                            <button class="rounded-md w-max bg-white dark:bg-dark-primary dark:text-white p-2 shadow-lg flex justify-center items-center gap-2 font-semibold" @click="handleAvatar" :disabled="pendingAvatar">
                                 <div class="bg-[rgba(48,48,48)] px-1 pt-1 text-white text-3xl rounded-md">
                                     <i v-if="pendingAvatar" class='bx bx-loader-alt bx-spin'></i>
                                     <i v-else class="bx bx-upload"></i>
                                 </div>
                                 Upload Avatar
                             </button>
-                            <button class="rounded-md w-max bg-white p-2 shadow-lg flex justify-center items-center gap-2 font-semibold" @click="avatar = null" :disabled="pendingAvatar">
+                            <button class="rounded-md w-max bg-white dark:bg-dark-primary dark:text-white p-2 shadow-lg flex justify-center items-center gap-2 font-semibold" @click="avatar = null" :disabled="pendingAvatar">
                                 <div class="bg-[rgba(48,48,48)] px-1 pt-1 text-white text-3xl rounded-md">
                                     <i class="bx bx-x"></i>
                                 </div>
@@ -53,10 +79,10 @@
                 </button>
             </div>
         </div>
-        <div class="w-full lg:w-1/2 grid grid-cols-1 grid-flow-row gap-2 bg-white mt-4">
-            <div class="w-full rounded-md shadow-sm p-4 flex gap-4 bg-white" v-if="user.authenticated && user._id == userData._id">
+        <div class="dark:text-white dark:bg-dark w-full mt-4 rounded-md lg:w-1/2 grid grid-cols-1 grid-flow-row gap-2 bg-white">
+            <div class="w-full rounded-md shadow-sm p-4 flex gap-4 dark:text-white dark:bg-dark-primary bg-white" v-if="user.authenticated && user._id == userData._id">
                 <img :src="user.avatar?.url" alt="" class="rounded-full w-12 h-12 object-cover">
-                <button class="rounded-full w-full text-left bg-black/10 px-4 font-light outline-none" @click="createPostStatus = true">
+                <button class="rounded-full w-full text-left dark:text-white dark:bg-dark-secondary bg-black/10 px-4 font-light outline-none" @click="createPostStatus = true">
                     Create post...
                 </button>
             </div>
@@ -87,6 +113,13 @@ const toast = useToast();
 const createPostStatus = ref(false);
 const postingStatus = ref(false);
 const avatar = ref(null);
+const banner = ref(null);
+
+const showFullBanner = ref(false);
+
+const handleFriendRequest = () => {
+    
+}
 
 const renderImage = file => URL.createObjectURL(file);
 
@@ -100,12 +133,13 @@ if (!userData.value) {
 const { data: posts, error: errorPosts, pending: pendingPosts, refresh: refreshPosts } = await getUserPosts(id);
 
 const pendingAvatar = ref(false);
+const pendingBanner = ref(false);
 
 console.log(userData.value, posts.value)
 
 const handleAvatarFilter = ({target}) => {
     if (!target.files.length) {
-        avatar.value = "";
+        avatar.value = null;
         return;
     };
 
@@ -118,22 +152,58 @@ const handleAvatarFilter = ({target}) => {
     avatar.value = target.files[0];
 }
 
+const handleBannerFilter = ({target}) => {
+    if (!target.files.length) {
+        banner.value = null;
+        return;
+    };
+
+    const allowed = ["png", "jpg", "jpeg", "webp"]
+    if (!allowed.includes(target.files[0].type.split("/")[1])) {
+        toast.value.push("Please Select An Photo!");
+        banner.value = null;
+        return;
+    }
+    banner.value = target.files[0];
+}
+
+const handleBanner = async () => {
+    console.log("kenapa gw ke eksekusi blog")
+    pendingBanner.value = true;
+    let formData = new FormData();
+    formData.append("banner", banner.value);
+    const { data, error, pending } = await uploadBanner(formData);
+    pendingBanner.value = pending.value
+    if (error.value) {
+        console.log(error.value)
+        toast.value.push("Cannot upload banner");
+        return;
+    }
+
+    userData.value.banner = data.value
+    user.$patch({
+        banner: data.value
+    })
+    banner.value = null;
+
+    toast.value.push("Banner images changed");
+}
+
 const handleAvatar = async () => {
     pendingAvatar.value = true;
     let formData = new FormData();
     formData.append("avatar", avatar.value);
     const { data, error, pending } = await uploadAvatar(formData);
     pendingAvatar.value = pending.value
-    console.log(data.value, error.value, pendingAvatar.value)
     if (error.value) {
         console.log(error.value)
         toast.value.push("Cannot upload avatar");
         return;
     }
 
-    userData.value.avatar = data.value.data
+    userData.value.avatar = data.value
     user.$patch({
-        avatar: data.value.data
+        avatar: data.value
     })
     avatar.value = null;
 

@@ -44,6 +44,8 @@ export const logout = async () => {
         toast.value.push(`Something Went Wrong, ${error.value.statusCode}`)
         return;
     }
+    const socket = useSocket();
+    socket.value.disconnect();
     toast.value.push("Logout Success")
     return navigateTo("/login");
 };

@@ -54,4 +54,8 @@
     .rounded-scrollbar::-webkit-scrollbar {
         @apply overflow-hidden rounded-lg;
     }
+
+    .dark-hover {
+        @apply bg-white/10
+    }
 }

@@ -4,6 +4,7 @@ export const userStore = defineStore("user", ({
         name: undefined,
         email: undefined,
         avatar: {},
+        banner: {},
         authenticated: false
         // _id: '64cca1b6f3659d15b7681d53',
         // name: 'Iqro Negoro',

@@ -12,6 +12,20 @@ export const getUserPosts = async id => await useApi(`users/${id}/posts`, {
 
 export const uploadAvatar = async avatar => await useApi(`users/avatar`, {
     method: "POST",
+    transform: res => res.data,
+    default: () => [],
     body: avatar,
     key: "upload-user-avatar"
 })
+
+export const uploadBanner = async banner => await useApi(`users/banner`, {
+    method: "POST",
+    transform: res => res.data,
+    default: () => [],
+    body: banner,
+    key: "upload-user-banner"
+})
+
+export const addFriendRequest = async id => {
+    
+}

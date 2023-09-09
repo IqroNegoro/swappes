@@ -1,12 +1,12 @@
 <template>
-    <div class="grid grid-cols-1 grid-flow-row gap-2">
-        <div class="rounded-md shadow-sm p-4 flex gap-4">
+    <div class="grid grid-cols-1 grid-flow-row gap-2 dark:bg-dark-primary">
+        <div class="rounded-md shadow-sm p-4 flex gap-4 dark:bg-dark-primary mt-2">
             <img :src="user.avatar?.url" alt="" class="rounded-full w-12 h-12 object-cover">
-            <button class="rounded-full w-full text-left bg-black/10 px-4 font-light outline-none" @click="createPostStatus = true">
+            <button class="dark:text-white dark:bg-dark-secondary rounded-full w-full text-left bg-black/10 px-4 font-light outline-none" @click="createPostStatus = true">
                 Create post...
             </button>
         </div>
-        <button class="mx-auto w-1/2 py-2 text-white text-md font-semibold bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm" :disabled="pending" @click="refresh">
+        <button class="dark:bg-dark-secondary dark:text-white mx-auto w-1/2 py-2 text-white text-md font-semibold bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm" :disabled="pending" @click="refresh">
             Refresh New Post
         </button>
         <div class="shadow-sm p-2 animate-pulse" v-if="postingStatus">
