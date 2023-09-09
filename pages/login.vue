@@ -1,22 +1,37 @@
 <template>
-    <div class="w-full h-screen flex justify-center items-center">
-       <form class="shadow-xl w-full md:w-1/2 lg:w-1/4 h-screen md:h-3/4 px-4 flex gap-4 justify-center items-center flex-col relative overflow-hidden" @submit.prevent="handleLogin">
-            <h1 class="font-semibold tracking-wider text-xl">Login To Swappes</h1>
-            <input type="email" class="w-3/4 rounded-sm bg-black/10 placeholder:text-black placeholder:text-sm p-2" placeholder="Email" v-model="email" autofocus>
-            <input type="password" class="w-3/4 rounded-sm bg-black/10 placeholder:text-black placeholder:text-sm p-2" placeholder="Password" v-model="password">
-            <button class="w-full bg-black/50 hover:bg-black/75 rounded-sm text-white py-2 disabled:bg-black/25 disabled:cursor-not-allowed" :disabled="pending" @click.prevent="handleLogin" type="submit" @submit.prevent="handleLogin">
-                Log in
-            </button>
-            <p>
-                Doesn't have account? 
-                <NuxtLink :to="{name: 'register'}" class="text-blue-500">
-                    register
-                </NuxtLink>
-                now!
-            </p>
-            <div class="absolute bottom-0 left-0 w-full h-32 bg-black/50 triangle"></div>
-       </form>
-       <Toast />
+    <div class="dark:bg-dark dark:text-white w-full h-screen grid grid-cols-1 md:grid-cols-2 grid-rows-1">
+        <div class="flex flex-col justify-between items-center md:items-start p-2">
+            <div class="text-left">
+                <p class="text-lg first-letter:text-4xl">Swappess</p>
+            </div>
+            <form class="flex flex-col gap-2 mx-auto md:w-3/4" @submit.prevent="handleLogin">
+                <h1 class="font-bold max-md:text-center text-3xl tracking-wider">Mari Masuk</h1>
+                <p class="dark:text-white max-md:text-center text-[#667085] tracking-wide">Yuk, masuk dengan akun mu untuk melanjutkan</p>
+                <div class="flex flex-col gap-2">
+                    <p class="font-semibold">Email</p>
+                    <div class="flex flex-row justify-center rounded-md items-center w-full border dark:border-white/50 border-black/50 p-1">
+                        <i class="bx bx-envelope text-2xl px-1"></i>
+                        <input type="text" class="w-full bg-transparent" placeholder="Enter Your Email" v-model="email">
+                    </div>
+                    <p class="font-semibold">Password</p>
+                    <div class="flex flex-row justify-center rounded-md items-center w-full border dark:border-white/50 border-black/50 p-1">
+                        <i class="bx bx-lock text-2xl px-1"></i>
+                        <input type="password" class="w-full bg-transparent" placeholder="Enter Your Password" v-model="password">
+                    </div>
+                </div>
+                <button class="disabled:cursor-not-allowed w-full bg-black/10 dark:bg-white/20 duration-150 dark:hover:bg-white/40 rounded-md p-2" type="submit" @submit.prevent="handleLogin" :disabled="pending">
+                    Masuk
+                </button>
+                <p class="max-md:text-center" >Belum punya akun nya? <NuxtLink :to="{name: 'register'}" class="font-semibold">Bikin Yuk</NuxtLink></p>
+            </form>
+            <div class="">
+                <p class="text-xs">
+                    &copy; Swappess 2023
+                </p>
+            </div>
+        </div>
+        <div class="max-md:hidden h-full w-full">
+        </div>
     </div>
 </template>
 <script setup>
@@ -24,11 +39,11 @@ const email = ref("iqronegoro0@gmail.com");
 const password = ref("test123");
 const user = userStore();
 const toast = useToast();
-let {data,error,pending} = {}
+let {data, error, pending} = {};
 
 const handleLogin = async () => {
     toast.value = [];
-    ({ data, error, pending } = await login(email.value, password.value))
+    ({data, error, pending} = await login(email.value, password.value));
     
     if (error.value) {
         if (error.value.data) {

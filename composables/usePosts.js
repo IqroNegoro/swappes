@@ -34,3 +34,10 @@ export const commentPost = async (id, comment) => await useApi(`posts/${id}/comm
     transform: res => res.data,
     key: `comment-post-${id}`
 })
+
+export const deleteComment = async (id, commentId) => await useApi(`posts/${id}/comments/${commentId}`, {
+    method: "DELETE",
+    key: `delete-comment-${commentId}`,
+    transform: res => res.data,
+    immediate: false
+})

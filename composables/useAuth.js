@@ -5,7 +5,7 @@ export const register = async (name = '', email = '', password = '') => await us
         email,
         password
     },
-    key: "register"
+    key: "register",
 });
 
 export const login = async (email = '', password = '') => await useApi("login", {
@@ -14,7 +14,7 @@ export const login = async (email = '', password = '') => await useApi("login", 
         email,
         password
     },
-    key: "login"
+    key: "login",
 })
 
 export const refreshLogin = async () => {
@@ -44,6 +44,7 @@ export const logout = async () => {
         toast.value.push(`Something Went Wrong, ${error.value.statusCode}`)
         return;
     }
+    
     const socket = useSocket();
     socket.value.disconnect();
     toast.value.push("Logout Success")

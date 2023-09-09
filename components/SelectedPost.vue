@@ -79,7 +79,22 @@
                         </button>
                     </div>
                     <TransitionGroup appear tag="div" name="fade-up" class="p-4 flex flex-col gap-4" v-if="!pendingComments && comments.length">
-                        <Comment v-for="comment in comments" :comment="comment" :key="comment._id" />
+                        <Comment v-for="comment in comments" :comment="comment" :key="comment._id" @delete-comment="id => comments = comments.filter(v => v._id != id)" />
+                        <!-- <div class="flex flex-row gap-2" v-for="comment in comments" :key="comment._id">
+                            <NuxtLink class="text-sm font-semibold" :to="{name: 'users-id', params: {id: comment.user._id}}">
+                                <img :src="comment.user.avatar?.url" class="w-10 h-10 object-cover rounded-full">
+                            </NuxtLink>
+                            <div class="flex flex-col gap-1">
+                                <div class="dark:bg-dark-secondary rounded-md bg-black/10 px-2 py-1">
+                                    <NuxtLink class="text-sm font-semibold" :to="{name: 'users-id', params: {id: comment.user._id}}">{{comment.user.name}}</NuxtLink>
+                                    <p class="text-sm text-justify" v-html="comment.comment"></p>
+                                </div>
+                                <div class="flex gap-4 px-2">
+                                    <button class="text-xs">Reply</button>
+                                    <button class="text-xs" v-if="comment.user._id == user._id" @click="handleDeleteComment">Delete</button>
+                                </div>
+                            </div>
+                        </div> -->
                     </TransitionGroup>
                     <div v-else class="flex flex-col justify-center items-center my-16 gap-2">
                         <i class='bx bx-chat text-5xl'></i>
@@ -102,7 +117,7 @@
 </template>
 <script setup>
 import moment from "moment";
-const emit = defineEmits(["deletePost", "likePost", "closeSelectedPost", "newComment"]);
+const emit = defineEmits(["deletePost", "likePost", "closeSelectedPost"]);
 const { post } = defineProps(["post"]);
 const toast = useToast();
 const user = userStore();
@@ -155,9 +170,10 @@ const handlePostComment = async () => {
         comment.value = "";
         toast.value.push("Comment Sent");
         if (!socket.value.connected) {
-            emit("newComment", data.value)
+            comments.value.push(comment)
         }
-        postContainer.value.scrollBy(0, postContainer.value.scrollHeight)
+        postContainer.value.scrollTop = postContainer.value.scrollHeight
+        socket.value.emit("notification", post._id)
     }
 }
 
@@ -174,14 +190,15 @@ const handleOverflowing = () => {
 onMounted(() => {
     // socket.connect();
     socket.value.emit("join-room", post._id);
-    socket.value.on("new-comment", comment => emit("newComment", comment))
+    socket.value.on("new-comment", comment => comments.value.push(comment));
+    socket.value.on("delete-comment", id => comments.value = comments.value.filter(v => v._id != id));
     if (descriptionContainer.value.clientHeight < descriptionContainer.value.scrollHeight) {
         isOverflowing.value = true;
     }
 })
 
 onUnmounted(() => {
-    // socket.value.emit("leave-room", post._id);
+    socket.value.emit("leave-room", post._id);
     // socket.disconnect();
 })
 </script>

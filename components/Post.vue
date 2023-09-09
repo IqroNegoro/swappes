@@ -62,7 +62,7 @@
             </button>
         </div>
         <TransitionGroup appear tag="div" name="fade-up" class="p-4 flex flex-col gap-4" v-if="comments.length">
-            <Comment v-for="comment in comments.slice(0,3)" :comment="comment" :key="comment._id" />
+            <Comment v-for="comment in comments.slice(0,3)" :comment="comment" :key="comment._id" @delete-comment="id => comments.filter(v => v._id != id)" />
         </TransitionGroup>
         <div class="w-full rounded-md shadow-sm p-2 gap-2 flex justify-center items-center">
             <img :src="user.avatar?.url" alt="" class="rounded-full w-8 h-8 object-cover">
@@ -73,7 +73,7 @@
                 </button>
             </div>
         </div>
-        <SelectedPost v-if="showSelectedPost" :post="post" @close-selected-post="showSelectedPost = false" @like-post="like => $emit('likePost', like)" @new-comment="comment => comments.push(comment)" />
+        <SelectedPost v-if="showSelectedPost" :post="post" @close-selected-post="showSelectedPost = false" @like-post="like => $emit('likePost', like)" />
     </div>
 </template>
 <script setup>
@@ -82,6 +82,7 @@ const emit = defineEmits(["deletePost", "likePost"]);
 const { post } = defineProps(["post"]);
 const toast = useToast();
 const user = userStore();
+const socket = useSocket();
 const divComment = ref(undefined);
 const comment = ref('');
 
@@ -122,6 +123,7 @@ const handlePostComment = async () => {
         divComment.value.innerHTML = "";
         comment.value = "";
         comments.value.push(data.value);
+        socket.value.emit("notifications", post._id)
     }
 }
 
