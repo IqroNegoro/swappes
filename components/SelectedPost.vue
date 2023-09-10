@@ -1,7 +1,7 @@
 <template>
     <div class="fixed  bg-black/50 top-0 left-0 w-full h-full flex justify-center items-center z-20" @click="$emit('closeSelectedPost')">
         <Transition name="fade-up" appear mode="in-out">
-            <div class="dark:bg-dark-primary dark:text-white relative md:rounded-md w-full md:w-3/4 h-full md:max-h-[85%] overflow-hidden bg-white flex flex-col" @click.stop>
+            <div ref="container" class="dark:bg-dark-primary dark:text-white relative md:rounded-md w-full md:w-3/4 h-full md:max-h-[85%] overflow-hidden bg-white flex flex-col" @click.stop>
                 <div class="relative flex justify-center items-center py-4">
                     <p class="font-semibold">{{post.user.name}} post</p>
                     <button class="flex justify-center items-center absolute top-0 right-0 m-2 text-2xl" @click="$emit('closeSelectedPost')">
@@ -55,7 +55,7 @@
                         <i class="bx bx-chat"></i> {{ comments.length }}
                     </div>
                     
-                    <div class="flex flex-row justify-between p-2 border-y border-black/10">
+                    <div class="flex flex-row justify-between p-2 dark:border-white/10 border-y border-black/10">
                         <button class="action-post" @click="handleLikePost">
                             <i class='bx bx-loader-alt bx-spin' v-if="pendingLike"></i>
                             <i class='bx bxs-like text-blue-500' v-else-if="post.likes.find(v => v._id == user._id)"></i>
@@ -122,7 +122,9 @@ const { post } = defineProps(["post"]);
 const toast = useToast();
 const user = userStore();
 const socket = useSocket();
+const rooms = roomsStore();
 
+const container = ref(undefined);
 const divComment = ref(undefined);
 const postContainer = ref(undefined);
 const comment = ref('');
@@ -172,8 +174,8 @@ const handlePostComment = async () => {
         if (!socket.value.connected) {
             comments.value.push(comment)
         }
+        rooms.rooms.push(post._id);
         postContainer.value.scrollTop = postContainer.value.scrollHeight
-        socket.value.emit("notification", post._id)
     }
 }
 
@@ -188,18 +190,21 @@ const handleOverflowing = () => {
 }
 
 onMounted(() => {
-    // socket.connect();
-    socket.value.emit("join-room", post._id);
+    socket.value.emit("join-post", post._id);
     socket.value.on("new-comment", comment => comments.value.push(comment));
     socket.value.on("delete-comment", id => comments.value = comments.value.filter(v => v._id != id));
+
     if (descriptionContainer.value.clientHeight < descriptionContainer.value.scrollHeight) {
         isOverflowing.value = true;
     }
 })
 
 onUnmounted(() => {
-    socket.value.emit("leave-room", post._id);
-    // socket.disconnect();
+    if (!rooms.joined(post._id)) {
+        socket.value.emit("leave-post", post._id);
+    }
+    socket.value.off("new-comment");
+    socket.value.off("delete-comment");
 })
 </script>
 <style scoped>

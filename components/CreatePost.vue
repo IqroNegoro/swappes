@@ -1,6 +1,6 @@
 <template>
-    <div class="fixed bg-black/50 top-0 left-0 w-full h-screen flex justify-center items-center overflow-auto z-20">
-        <div class="rounded-md w-full md:w-1/2 bg-white flex flex-col p-1 relative">
+    <div class="fixed bg-black/50 top-0 left-0 w-full h-screen flex justify-center items-center overflow-auto z-20" @click.self="$emit('closeCreatePostStatus')">
+        <div class="rounded-md w-full md:w-1/2 dark:bg-dark-primary dark:text-white bg-white flex flex-col p-1 relative">
             <div class="absolute top-0 left-0 w-full h-full bg-white/50 z-30" v-if="pending"></div>
             <div class="text-right flex justify-between items-center flex-row p-2">
                 <div></div>
@@ -27,12 +27,12 @@
                     </div>
                 </div>
             </div>
-            <label for="imagesInput" class="w-max m-4 rounded-sm bg-black/50 hover:bg-black/75 transition-all duration-150 py-1 px-2 text-white cursor-pointer">
+            <label for="imagesInput" class="w-max m-4 rounded-sm dark:bg-dark-secondary dark:hover:bg-white/30 bg-black/50 hover:bg-black/75 transition-all duration-150 py-1 px-2 text-white cursor-pointer">
                 <i class='bx bxs-file-image'></i>
                 Add Images Up To 4 Images
             </label>
             <input type="file" multiple name="images[]" accept=".jpg,.jpeg,.png,.webp" id="imagesInput" class="hidden" @input="handleInputFile">
-            <button class="mx-auto w-1/2 py-2 text-white text-xl font-semibold bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm" :disabled="pending" @click="handlePost">
+            <button class="mx-auto w-1/2 py-2 text-white text-xl font-semibold dark:bg-dark-secondary dark:hover:bg-white/30 bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm" :disabled="pending" @click="handlePost">
                 Post
             </button>
         </div>
@@ -42,7 +42,7 @@
 const user = userStore();
 const emit = defineEmits(["newPost", "postingStatus", "closeCreatePostStatus"])
 const toast = useToast();
-let { data, pending, error, refresh } = useFetch();
+let { data, pending, error, refresh } = {};
 const textarea = ref(null);
 const description = ref("");
 const images = ref([]);
