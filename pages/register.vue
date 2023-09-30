@@ -4,7 +4,7 @@
             <div class="text-left">
                 <p class="text-lg first-letter:text-4xl">Swappess</p>
             </div>
-            <form class="flex flex-col gap-2 mx-auto md:w-3/4" @submit.prevent="handleLogin">
+            <form class="flex flex-col gap-2 mx-auto md:w-3/4" @submit.prevent="handleRegister">
                 <h1 class="font-bold max-md:text-center text-3xl tracking-wider">Yuk, Bikin Akun</h1>
                 <p class="dark:text-white max-md:text-center text-[#667085] tracking-wide">Bikin akun dulu untuk melanjutkan</p>
                 <div class="flex flex-col gap-2">
@@ -24,7 +24,7 @@
                         <input type="password" class="w-full bg-transparent" placeholder="Enter Your Password" v-model="password">
                     </div>
                 </div>
-                <button class="w-full bg-black/10 dark:bg-white/20 duration-150 dark:hover:bg-white/40 rounded-md p-2" type="submit" @submit.prevent="handleLogin">
+                <button class="w-full bg-black/10 dark:bg-white/20 duration-150 dark:hover:bg-white/40 rounded-md p-2" type="submit" @submit.prevent="handleRegister" :disabled="pending">
                     Buat Akun
                 </button>
                 <p class="max-md:text-center" >Sudah punya akun? <NuxtLink :to="{name: 'login'}" class="font-semibold">Masuk Yuk</NuxtLink></p>
@@ -37,6 +37,7 @@
         </div>
         <div class="max-md:hidden h-full w-full">
         </div>
+        <Toast />
     </div>
 </template>
 <script setup>

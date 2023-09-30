@@ -1,17 +1,38 @@
 <template>
-    <NuxtLink to="" class="p-1 dark:hover:dark-hover relative flex flex-row justify-center items-center gap-2 rounded-md transition-transform duration-150 hover:bg-black/10">
-        <div class="absolute top-0 right-0 text-xs bg-blue-500 m-1 rounded-full w-2 h-2"></div>
-        <img :src="notification.from.avatar?.url" alt="" class="rounded-full w-12 h-12 object-cover">
-        <div class="text-left">
-            <h1 class="font-semibold">{{ notification.from.name }}</h1>
-            <p class="line-clamp-3 break-words text-sm">
-                {{ notification.content }} <span class="font-semibold">{{notification.post.description}}</span>
-            </p>
-            <span class="text-xs tracking-wide font-semibold">{{ moment(notification.createdAt).fromNow() }}</span>
+    <Transition name="pop-down" appear mode="in-out">
+        <div class="fixed top-4 md:top-0 md:left-0 flex flex-row gap-4 z-[99] rounded-md bg-white p-2 shadow-md w-max max-md:-translate-x-1/2 left-1/2 max-md:mt-3 md:m-4 dark:bg-dark-secondary dark:hover:bg-dark-secondary dark:text-white hover:bg-slate-200 transition-all duration-300 cursor-pointer">
+            <div class="flex flex-row gap-3 items-center">
+                <img :src="notification.from?.avatar?.url" class="rounded-full w-12 h-12 object-center object-cover" alt="">
+                <div>
+                    <p class="text-xs md:text-base">
+                        <span class="font-semibold">
+                            {{ notification.from.name }}
+                        </span>
+                        {{ notification.content }}
+                    </p>
+                    <span class="text-slate-500 text-xs dark:text-white/75 font-semibold">{{ moment(notification.createdAt).fromNow() }}</span>
+                </div>
+            </div>
+            <button class="self-start rounded-full -translate-y-1" @click="notification = {}">
+                <i class="bx bx-x text-xl rounded-full"></i>
+            </button>
         </div>
-    </NuxtLink>
+    </Transition>
 </template>
 <script setup>
 import moment from "moment";
-const { notification } = defineProps(["notification"]);
+const notification = useNotification();
 </script>
+<style scoped>
+.pop-down-enter-active,
+.pop-down-leave-active {
+  transition: all 0.5s ease;
+}
+
+.pop-down-enter-from,
+.pop-down-leave-to {
+  opacity: 0;
+  transform: translateY(-20px)
+    }
+
+</style>

@@ -9,21 +9,23 @@
             <div v-if="!userData.banner?.url && !banner" class="w-full h-48 bg-gradient-to-b from-transparent to-white/25"></div>
             <img v-else-if="!banner" :src="userData.banner?.url" alt="banner" class="object-top object-cover w-full max-h-96">
             <img v-else :src="renderImage(banner)" alt="" class="object-top object-cover w-full max-h-96">
-            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black/25" @click.self="showFullBanner = true"></div>
+            <div v-if="userData.banner?.url || banner" class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black/25" @click.self="showFullBanner = true"></div>
             <div class="absolute right-0 bottom-0 m-4 flex flex-col gap-2">
                 <label for="bannerInput" v-if="user._id == userData._id && !banner" class="cursor-pointer text-white flex justify-center items-center gap-2 rounded-md bg-black/30 hover:bg-black/40 duration-150 p-2">
                     <i class="bx bx-camera"></i>
                     <p class="max-md:hidden">Upload Banner</p>
                 </label>
-                <button v-else class="cursor-pointer text-white flex justify-center items-center gap-2 rounded-md bg-black/30 hover:bg-black/40 duration-150 p-2" @click="handleBanner" :disabled="pendingBanner">
-                    <i v-if="pendingBanner" class='bx bx-loader-alt bx-spin'></i>
-                    <i v-else class="bx bx-upload"></i>
-                    <p class="max-md:hidden">Upload Banner</p>
-                </button>
-                <button v-if="banner" class="cursor-pointer text-white flex justify-center items-center gap-2 rounded-md bg-black/30 hover:bg-black/40 duration-150 p-2" @click="banner = null" :disabled="pendingBanner">
-                    <i class="bx bx-x"></i>
-                    <p class="max-md:hidden">Cancel</p>
-                </button>
+                <div v-if="banner" class="flex gap-2 flex-col">
+                    <button class="cursor-pointer text-white flex justify-center items-center gap-2 rounded-md bg-black/30 hover:bg-black/40 duration-150 p-2" @click="handleBanner" :disabled="pendingBanner">
+                        <i v-if="pendingBanner" class='bx bx-loader-alt bx-spin'></i>
+                        <i v-else class="bx bx-upload"></i>
+                        <p class="max-md:hidden">Upload Banner</p>
+                    </button>
+                    <button class="cursor-pointer w-max text-white flex justify-center items-center gap-2 rounded-md bg-black/30 hover:bg-black/40 duration-150 p-2" @click="banner = null" :disabled="pendingBanner">
+                        <i class="bx bx-x"></i>
+                        <p class="max-md:hidden">Cancel</p>
+                    </button>
+                </div>
                 <input type="file" accept=".jpg,.jpeg,.webp,.png" id="bannerInput" class="hidden" @input="handleBannerFilter">
             </div>
         </div>
@@ -35,14 +37,10 @@
                 </p>
                 <p>
                     0 <br>
-                    Comments
-                </p>
-                <p>
-                    0 <br>
                     Friends
                 </p>
             </div>
-            <div class="-translate-y-28 max-md:order-first text-center">
+            <div class="-translate-y-28 z-10 max-md:order-first text-center">
                 <div class="relative">
                     <img v-if="!avatar" :src="userData.avatar?.url" alt="" class="rounded-full w-48 h-48 object-cover mx-auto object-center bg-white">
                     <img v-else :src="renderImage(avatar)" class="rounded-full w-48 h-48 mx-auto object-cover object-center bg-white">
@@ -95,10 +93,10 @@
                 Something Went Wrong
                 <button @click="refreshPosts" class="text-white bg-black/50 hover:bg-black/75 px-2 py-1 transition-all duration-300">Try Again</button>
             </div>
-            <div v-else-if="!posts.posts.length" class="flex justify-center items-center flex-col bg-white shadow-md h-96">
+            <div v-else-if="!posts.posts.length" class="dark:bg-dark-primary dark:text-white flex justify-center items-center flex-col bg-white shadow-md h-96">
                 <i class='bx bx-check text-7xl'></i>
                 <h1>It looks like you have been see all posts!</h1>
-                <button @click="refreshPosts" class="text-white bg-black/50 hover:bg-black/75 px-2 py-1 transition-all duration-300">Refresh</button>
+                <button @click="refreshPosts" class="text-white bg-black/50 hover:bg-black/75 dark:bg-dark px-2 py-1 transition-all duration-300">Refresh</button>
             </div>
             <Post v-else v-for="post in posts.posts" :key="post._id" :post="post" @delete-post="id => posts.posts = posts.posts.filter(v => v._id != id)" @like-post="likes => posts.posts.find(v => v._id == likes._id).likes = likes.likes"  />
             <CreatePost v-show="createPostStatus" @new-post="post => posts.posts.unshift(post)" @close-create-post-status="createPostStatus = false" @posting-status="status => postingStatus = status" />
@@ -125,7 +123,6 @@ const renderImage = file => URL.createObjectURL(file);
 
 const { data: userData, error: userError, pending: pendingUser, refresh: refreshUser } = await getUserById(id);
 
-console.log(userData.value)
 if (!userData.value) {
     throw createError({statusCode: 404, statusMessage: "User Doesnt Exist"});
 }

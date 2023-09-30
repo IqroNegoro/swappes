@@ -17,10 +17,10 @@
                 </div>
             </div>
             <div class="min-h-[8rem] max-h-96 overflow-y-auto">
-                <div contenteditable="true" ref="textarea" class="outline-none px-2 z-10 min-h-[8rem]" @input="({target}) => description = target.innerText"></div>
+                <div contenteditable="true" ref="textarea" class="outline-none px-2 mb-4 z-10 min-h-[8rem]" @input="({target}) => description = target.innerText"></div>
                 <div v-if="images.length" class="grid gap-1 rounded-xl overflow-hidden" :class="{'grid-cols-1 grid-rows-1': images.length == 1, 'grid-cols-2 grid-rows-1': images.length == 2, 'grid-cols-2 grid-rows-2': images.length == 3, 'grid-cols-2 grid-rows-2': images.length == 4}">
                     <div class="relative" v-for="(image, i) in images" :key="i" :class="{'col-span-2': i == 0 && images.length == 3}">
-                        <button class="absolute top-0 right-0 px-1 bg-white rounded-full m-1" @click="images.splice(i, 1)">
+                        <button class="absolute dark:bg-dark-primary dark:text-white top-0 right-0 px-1 bg-white rounded-full m-1" @click="images.splice(i, 1)">
                             <i class="bx bx-x text-xl rounded-full"></i>
                         </button>
                         <img :src="renderImage(image)" :alt="image.name" class="w-full" :class="{'aspect-square object-cover object-top': images.length > 1}" draggable="false">

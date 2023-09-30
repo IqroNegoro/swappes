@@ -20,9 +20,9 @@
                         <i class="bx bx-bell text-5xl"></i>
                         <p>There's no notifications</p>
                     </div>
-                    <div class="flex flex-col gap-3 px-2 pt-2 absolute right-0 dark:bg-dark-primary dark:text-white bg-white rounded-md w-80 max-h-[80vh] overflow-y-scroll shadow-md overscroll-contain" v-else>
+                    <div class="light-scrollbar rounded-scrollbar flex flex-col gap-3 px-2 pt-2 absolute right-0 dark:bg-dark-primary dark:text-white bg-white rounded-md w-80 max-h-[80vh] overflow-y-scroll shadow-md overscroll-contain" v-else>
                         <h1 class="font-black text-2xl text-left">Notifications</h1>
-                        <Notification v-for="notification in notifications" :key="notification._id" :notification="notification" />
+                        <NotificationList v-for="notification in notifications" :key="notification._id" :notification="notification" />
                         <!-- <div class="w-full p-1 relative flex flex-row items-center gap-2 rounded-md transition-transform duration-150 hover:bg-black/10 hover:-translate-y-2">
                             <img :src="user.avatar?.url" alt="" class="rounded-full w-12 h-12 object-cover">
                             <div class="text-left">
@@ -66,9 +66,9 @@
     </div>
 </template>
 <script setup>
-import moment from "moment"
 const user = userStore();
 const socket = useSocket();
+const notification = useNotification();
 const showNotificationsMenu = ref(false);
 const showUserMenu = ref(false);
 
@@ -93,11 +93,14 @@ console.log(notifications.value)
 watch(computed(() => useRoute().name), () => showUserMenu.value = false);
 
 onMounted(() => {
-    socket.value.on("notification", notification => {
-        console.log(notification)
-        // if (notification.user._id != user._id) {
-        //     notifications.value.unshift(notification)
-        // }
+    const audioNotification = new Audio("/sfx/notification.mp3")
+    console.log("KENAPAAHHH!!!!!")
+    socket.value.on("notification", newNotification => {
+        console.log(newNotification)
+        if (user._id != newNotification.from._id) {
+            notification.value = newNotification;
+            audioNotification.play();
+        }
     });
 })
 </script>

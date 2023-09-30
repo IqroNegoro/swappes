@@ -32,6 +32,7 @@
         </div>
         <div class="max-md:hidden h-full w-full">
         </div>
+        <Toast />
     </div>
 </template>
 <script setup>
@@ -46,6 +47,10 @@ const handleLogin = async () => {
     ({data, error, pending} = await login(email.value, password.value));
     
     if (error.value) {
+        if (error.value.statusCode == 404) {
+            toast.value.push(error.value.data.message)
+            return;
+        }
         if (error.value.data) {
             if (error.value.data.message) {
                 toast.value.push(error.value.data.message);

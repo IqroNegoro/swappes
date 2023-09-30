@@ -6,9 +6,11 @@
             <slot />
             <div class="max-lg:hidden"></div>
         </div>
+        <Notification v-if="notification._id" />
         <Toast v-if="toast.length" />
     </div>
 </template>
 <script setup>
 const toast = useToast();
+const notification = useNotification();
 </script>

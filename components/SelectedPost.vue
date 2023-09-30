@@ -105,7 +105,7 @@
                     <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-20" v-if="pendingSendComment"></div>
                     <img :src="user.avatar?.url" alt="" class="rounded-full w-8 h-8 object-cover">
                     <div class="relative w-full">
-                        <div ref="divComment" contenteditable="true" placeholder="Write your comment..." class="cursor-pointer rounded-lg w-full text-left bg-black/10 px-4 py-2 font-light outline-none" @input="({target}) => comment = target.innerText"></div>
+                        <div ref="divComment" contenteditable="true" placeholder="Write your comment..." class="cursor-pointer rounded-lg w-full text-left bg-black/10 px-4 py-2 font-light outline-none" @input="({target}) => comment = target.innerText" @keydown.shift.enter="handlePostComment" autofocus></div>
                         <button class="absolute top-0 right-0 w-4 h-full flex justify-center items-center px-4" @click="handlePostComment">
                             <i class="bx bx-send"></i>
                         </button>
@@ -170,7 +170,6 @@ const handlePostComment = async () => {
     } else {
         divComment.value.innerHTML = "";
         comment.value = "";
-        toast.value.push("Comment Sent");
         if (!socket.value.connected) {
             comments.value.push(comment)
         }
@@ -189,7 +188,12 @@ const handleOverflowing = () => {
     showLess.value = !showLess.value;
 }
 
+const escClick = ({code}) => {
+    if (code == "Escape") emit("closeSelectedPost");
+}
+
 onMounted(() => {
+    document.addEventListener("keydown", escClick)
     socket.value.emit("join-post", post._id);
     socket.value.on("new-comment", comment => comments.value.push(comment));
     socket.value.on("delete-comment", id => comments.value = comments.value.filter(v => v._id != id));
@@ -200,6 +204,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+    document.removeEventListener("keydown", escClick)
     if (!rooms.joined(post._id)) {
         socket.value.emit("leave-post", post._id);
     }

@@ -2,8 +2,8 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: [
-    "@pinia/nuxt",
     "@nuxtjs/tailwindcss",
+    "@pinia/nuxt"
   ],
   app: {
     head: {
@@ -27,4 +27,7 @@ export default defineNuxtConfig({
   tailwindcss: {
     cssPath: '~/assets/css/tailwind.css'
   },
+  runtimeConfig: {
+    apiURL: "https://api.swappes.my.id/"
+  }
 })
