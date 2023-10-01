@@ -7,7 +7,7 @@
 // let baseURL = useRuntimeConfig().apiURL
 export const useApi = async (url, options) => await useFetch(url, {
     ...options,
-    credentials: "include",
     headers: useRequestHeaders(["cookie"]),
+    credentials: "include",
     baseURL: "https://api.swappes.my.id/"
 })

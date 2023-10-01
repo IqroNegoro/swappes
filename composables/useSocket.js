@@ -2,9 +2,8 @@ import io from "socket.io-client";
 const socket = ref(undefined);
 export default () => {
     if (socket.value) return socket;
-    let baseURL = useRuntimeConfig().apiURL
     if (process.client) {
-        socket.value = io(baseURL, {
+        socket.value = io("https://api.swappes.my.id/", {
             autoConnect: false,
             withCredentials: true
         });

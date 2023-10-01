@@ -20,7 +20,10 @@
                     </div>
                 </div>
                 <button class="disabled:cursor-not-allowed w-full bg-black/10 dark:bg-white/20 duration-150 dark:hover:bg-white/40 rounded-md p-2" type="submit" @submit.prevent="handleLogin" :disabled="pending">
-                    Masuk
+                    <i v-if="pending" class="bx bx-loading"></i>
+                    <p v-else>
+                        Masuk
+                    </p>
                 </button>
                 <p class="max-md:text-center" >Belum punya akun nya? <NuxtLink :to="{name: 'register'}" class="font-semibold">Bikin Yuk</NuxtLink></p>
             </form>
@@ -37,10 +40,10 @@
 </template>
 <script setup>
 const email = ref("iqronegoro0@gmail.com");
-const password = ref("test123");
+const password = ref("iqrodesu");
 const user = userStore();
 const toast = useToast();
-let {data, error, pending} = {};
+let {data, error, pending} = ref({});
 
 const handleLogin = async () => {
     toast.value = [];

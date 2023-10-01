@@ -168,11 +168,11 @@ const handlePostComment = async () => {
             toast.value.push(v)
         })
     } else {
-        divComment.value.innerHTML = "";
-        comment.value = "";
         if (!socket.value.connected) {
             comments.value.push(comment)
         }
+        divComment.value.innerHTML = "";
+        comment.value = "";
         rooms.rooms.push(post._id);
         postContainer.value.scrollTop = postContainer.value.scrollHeight
     }
