@@ -40,7 +40,7 @@
 </template>
 <script setup>
 const email = ref("iqronegoro0@gmail.com");
-const password = ref("iqrodesu");
+const password = ref(process.env === "production" ? "iqrodesu" : "iqronegoro");
 const user = userStore();
 const toast = useToast();
 let {data, error, pending} = ref({});

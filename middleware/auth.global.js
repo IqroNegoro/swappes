@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     let whitelist = ["login", "register"];
     let whitelistPage = ["users-id"];
     if (whitelist.includes(to.name) || whitelist.includes(from.name)) return;
-    // if (!user.authenticated && whitelistPage.includes(to.name)) return;
+ 
     if (await refreshLogin()) {
         const user = userStore();
         const toast = useToast();
