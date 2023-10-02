@@ -23,7 +23,6 @@ export const refreshLogin = async () => {
         key: "refresh",
     })
     if (error.value) return true;
-    console.log(data.value)
     const user = userStore();
     user.$patch({
         ...data.value,

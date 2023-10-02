@@ -3,7 +3,8 @@ const socket = ref(undefined);
 export default () => {
     if (socket.value) return socket;
     if (process.client) {
-        socket.value = io("https://api.swappes.my.id/", {
+        // socket.value = io("https://api.swappes.my.id/", {
+        socket.value = io("http://localhost:3001/", {
             autoConnect: false,
             withCredentials: true
         });

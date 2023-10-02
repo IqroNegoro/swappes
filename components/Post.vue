@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="px-2 relative">
-            <p class="text-sm text-justify line-clamp-6 cursor-context-menu" ref="descriptionContainer" @click="handleOverflowing">
+            <p class="text-sm text-justify line-clamp-6 cursor-context-menu whitespace-pre-line" ref="descriptionContainer" @click="handleOverflowing">
                 {{ post.description }}
             </p>
             <button class="text-sm text-blue-500" @click="handleOverflowing" v-if="isOverflowing && !showLess">

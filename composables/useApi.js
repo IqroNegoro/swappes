@@ -9,5 +9,6 @@ export const useApi = async (url, options) => await useFetch(url, {
     ...options,
     headers: useRequestHeaders(["cookie"]),
     credentials: "include",
-    baseURL: "https://api.swappes.my.id/"
+    // baseURL: "https://api.swappes.my.id/"
+    baseURL: "http://localhost:3001/"
 })

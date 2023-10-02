@@ -88,13 +88,10 @@ watch(showNotificationsMenu, async (newVal) => {
     immediate: true
 })
 
-console.log(notifications.value)
-
 watch(computed(() => useRoute().name), () => showUserMenu.value = false);
 
 onMounted(() => {
     const audioNotification = new Audio("/sfx/notification.mp3")
-    console.log("KENAPAAHHH!!!!!")
     socket.value.on("notification", newNotification => {
         console.log(newNotification)
         if (user._id != newNotification.from._id) {
