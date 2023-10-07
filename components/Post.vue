@@ -7,7 +7,7 @@
                 </NuxtLink>
                 <div>
                     <NuxtLink :to="{name: 'users-id', params: {id: post.user._id}}" class="text-sm font-bold">{{ post.user.name }}</NuxtLink>
-                <p class="text-xs">{{ moment(post.createdAt).fromNow() }} &bull; <i class='bx bx-world'></i></p>
+                    <p class="text-xs">{{ moment(post.createdAt).fromNow() }} &bull; <i class='bx bx-world'></i></p>
                 </div>
             </div>
             <div class="relative">
@@ -39,7 +39,7 @@
             </button>
         </div>
         <div class="grid gap-1" :class="{'grid-cols-1 grid-rows-1': post.images.length == 1, 'grid-cols-2 grid-rows-1': post.images.length == 2, 'grid-cols-2 grid-rows-2': post.images.length == 3, 'grid-cols-2 grid-rows-2': post.images.length == 4}">
-            <img v-for="(images, i) in post.images" :key="images.discordId" :src="images.images" alt="attachments" class="w-full overflow-hidden cursor-pointer" :class="{'aspect-square object-cover object-top': post.images.length > 1, 'col-span-2': i == 0 && post.images.length == 3}" loading="lazy" @click="showSelectedPost = true">
+            <img v-for="(images, i) in post.images" :key="images.discordId" :src="images.images" alt="attachments" class="w-full overflow-hidden cursor-pointer" :class="{'aspect-square object-cover object-top': post.images.length > 1, 'col-span-2 h-64': i == 0 && post.images.length == 3}" loading="lazy" @click="showSelectedPost = true">
         </div>
         <div class="px-2">
             <i class="bx bx-like"></i> {{ post.likes.length }}

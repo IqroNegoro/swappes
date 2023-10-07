@@ -10,12 +10,14 @@
             Refresh New Post
         </button>
         <div class="shadow-sm p-2 animate-pulse" v-if="postingStatus">
-            <h1>Posting...</h1>
+            <h1 class="dark:text-white">Posting...</h1>
         </div>
         <PostSkeleton v-if="pending" />
-            <div v-else-if="error" class="flex flex-col justify-center items-center">
-            Something Went Wrong
-            <button @click="refresh" class="text-white bg-black/50 hover:bg-black/75 px-2 py-1 transition-all duration-300">Try Again</button>
+        <div v-else-if="error" class="flex flex-col justify-center gap-2 items-center py-3">
+            <p class="dark:text-white">
+                Something Went Wrong
+            </p>
+            <button @click="refresh" class="text-white bg-black/50 hover:bg-black/75 dark:bg-dark-secondary px-2 py-1 transition-all duration-300">Try Again</button>
         </div>
         <div v-else-if="!posts.length" class="flex justify-center dark:bg-dark-primary dark:text-white items-center flex-col bg-white shadow-md h-96">
             <i class='bx bx-check text-7xl'></i>

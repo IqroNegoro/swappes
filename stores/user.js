@@ -6,9 +6,5 @@ export const userStore = defineStore("user", ({
         avatar: {},
         banner: {},
         authenticated: false
-        // _id: '64cca1b6f3659d15b7681d53',
-        // name: 'Iqro Negoro',
-        // email: 'iqronegoro0@gmail.com',
-        // authenticated: true
     })
 }))

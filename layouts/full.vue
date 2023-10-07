@@ -1,7 +1,7 @@
 <template>
     <div class="min-h-screen w-full dark:bg-dark">
-        <Navbar />
-        <div class="mt-16">
+        <!-- <Navbar /> -->
+        <div class="">
             <slot />
         </div>
         <Toast v-if="toast.length" />

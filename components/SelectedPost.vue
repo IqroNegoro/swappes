@@ -1,7 +1,7 @@
 <template>
     <div class="fixed  bg-black/50 top-0 left-0 w-full h-full flex justify-center items-center z-20" @click="$emit('closeSelectedPost')">
         <Transition name="fade-up" appear mode="in-out">
-            <div ref="container" class="dark:bg-dark-primary dark:text-white relative md:rounded-md w-full md:w-3/4 h-full md:max-h-[85%] overflow-hidden bg-white flex flex-col" @click.stop>
+            <div ref="container" class="dark:bg-dark-primary dark:text-white relative md:rounded-md w-full md:w-1/2 h-full md:max-h-[85%] overflow-hidden bg-white flex flex-col" @click.stop>
                 <div class="relative flex justify-center items-center py-4">
                     <p class="font-semibold">{{post.user.name}} post</p>
                     <button class="flex justify-center items-center absolute top-0 right-0 m-2 text-2xl" @click="$emit('closeSelectedPost')">
@@ -23,7 +23,7 @@
                             <button class="text-2xl pt-1 px-2 rounded-full" :class="{'bg-black/10': showPostMenu}" @click="showPostMenu = !showPostMenu">
                                 <i class='bx bx-dots-horizontal-rounded'></i>
                             </button>
-                            <div v-if="showPostMenu" class="absolute top-full right-0 flex flex-col items-start w-48 bg-white z-10 rounded-lg shadow-md" @click="showPostMenu = false">
+                            <div v-if="showPostMenu" class="absolute dark:bg-dark-primary dark:text-white top-full right-0 flex flex-col items-start w-48 bg-white z-10 rounded-lg shadow-md" @click="showPostMenu = false">
                                 <button class="p-1 text-left font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" v-if="user._id == post.user._id">
                                     <i class='bx bx-pencil text-2xl'></i>
                                     <p class="">
@@ -48,7 +48,9 @@
                         </button>
                     </div>
                     <div class="grid gap-1" :class="{'grid-cols-1 grid-rows-1': post.images.length == 1, 'grid-cols-2 grid-rows-1': post.images.length == 2, 'grid-cols-2 grid-rows-2': post.images.length == 3, 'grid-cols-2 grid-rows-2': post.images.length == 4}">
-                        <img v-for="(images, i) in post.images" :key="images.discordId" :src="images.images" alt="attachments" class="w-full overflow-hidden" :class="{'aspect-square object-cover object-top': post.images.length > 1, 'col-span-2': i == 0 && post.images.length == 3}" loading="lazy">
+                        <NuxtLink :to="{name: `posts-id`, params: {id: post._id}}" v-for="(images, i) in post.images" :key="images.discordId" :class="{'col-span-2': i == 0 && post.images.length == 3}">
+                            <img :src="images.images" alt="attachments" class="w-full overflow-hidden" :class="{'aspect-square object-cover object-top': post.images.length > 1, 'col-span-2 h-64': i == 0 && post.images.length == 3}" loading="lazy">
+                        </NuxtLink>
                     </div>
                     <div class="px-2">
                         <i class="bx bx-like"></i> {{ post.likes.length }}
@@ -71,14 +73,14 @@
                         <i class="bx bx-loader-alt bx-spin text-5xl"></i>
                         <p>Load Comments...</p>
                     </div>
-                    <div v-if="errorComments" class="flex flex-col justify-center items-center my-16 gap-2">
+                    <div v-else-if="errorComments" class="flex flex-col justify-center items-center my-16 gap-2">
                         <i class='bx bx-error-circle text-5xl'></i>
                         <p>Something Wrong</p>
-                        <button class="mx-auto p-2 text-white text-md font-semibold bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm" @click="refreshComments">
+                        <button class="mx-auto p-2 text-white text-md font-semibold dark:bg-dark-secondary bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm" @click="refreshComments">
                             Try Again
                         </button>
                     </div>
-                    <TransitionGroup appear tag="div" name="fade-up" class="p-4 flex flex-col gap-4" v-if="!pendingComments && comments.length">
+                    <TransitionGroup appear tag="div" name="fade-up" class="p-4 flex flex-col gap-4" v-else-if="comments.length">
                         <Comment v-for="comment in comments" :comment="comment" :key="comment._id" @delete-comment="id => comments = comments.filter(v => v._id != id)" />
                         <!-- <div class="flex flex-row gap-2" v-for="comment in comments" :key="comment._id">
                             <NuxtLink class="text-sm font-semibold" :to="{name: 'users-id', params: {id: comment.user._id}}">
@@ -105,7 +107,7 @@
                     <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-20" v-if="pendingSendComment"></div>
                     <img :src="user.avatar?.url" alt="" class="rounded-full w-8 h-8 object-cover">
                     <div class="relative w-full">
-                        <div ref="divComment" contenteditable="true" placeholder="Write your comment..." class="cursor-pointer rounded-lg w-full text-left bg-black/10 px-4 py-2 font-light outline-none" @input="({target}) => comment = target.innerText" @keydown.shift.enter="handlePostComment" autofocus></div>
+                        <div ref="divComment" contenteditable="true" placeholder="Write your comment..." class="cursor-pointer rounded-lg w-full text-left bg-black/10 px-4 py-2 font-light outline-none" @input="({target}) => comment = target.innerText" @keydown.ctrl.enter="handlePostComment" autofocus></div>
                         <button class="absolute top-0 right-0 w-4 h-full flex justify-center items-center px-4" @click="handlePostComment">
                             <i class="bx bx-send"></i>
                         </button>
@@ -123,7 +125,6 @@ const toast = useToast();
 const user = userStore();
 const socket = useSocket();
 const rooms = roomsStore();
-
 const container = ref(undefined);
 const divComment = ref(undefined);
 const postContainer = ref(undefined);
@@ -160,7 +161,8 @@ const handlePostComment = async () => {
     pendingSendComment.value = true;
     const { data, error } = await commentPost(post._id, {
         comment: comment.value,
-        images: ""
+        images: "",
+        post
     });
     pendingSendComment.value = false;
     if (error.value) {

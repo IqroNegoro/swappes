@@ -211,6 +211,21 @@ definePageMeta({
     layout: "full",
 })
 
+useSeoMeta({
+    title: `${userData.value.name} in Swappes`,
+    ogTitle: `${userData.value.name} in Swappes`,
+    twitterTitle: `${userData.value.name} in Swappes`,
+    description: `See ${userData.value.name} in Swappes`,
+    ogDescription: `See ${userData.value.name} in Swappes`,
+    twitterDescription: `See ${userData.value.name} in Swappes`,
+    ogType: "website",
+    ogSiteName: "Swappes",
+    applicationName: "Swappes",
+    twitterCard: "app",
+    twitterImage: userData.value.avatar?.url,
+    ogImage: userData.value.avatar?.url
+})
+
 useHead({
     title: !userData.value ? "Not Found" : `${userData.value.name} in Swappes`
 })

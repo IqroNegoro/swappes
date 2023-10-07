@@ -10,7 +10,7 @@
                         </span>
                         {{ notification.content }}
                     </p>
-                    <span class="text-slate-500 text-xs dark:text-white/75 font-semibold">{{ moment(notification.createdAt).fromNow() }}</span>
+                    <span class="text-slate-500 text-xs dark:text-white/75 font-semibold">{{ moment(notification.updatedAt).fromNow() }}</span>
                 </div>
             </div>
             <button class="self-start rounded-full -translate-y-1" @click="notification = {}">

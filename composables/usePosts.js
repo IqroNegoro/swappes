@@ -4,6 +4,12 @@ export const getPosts = async () => await useApi("posts", {
     key: "get-post"
 })
 
+export const getPost = async id => await useApi(`posts/${id}`, {
+    transform: res => res.data,
+    default: () => [],
+    key: `get-post-{id}`
+})
+
 export const createPost = async post => await useApi("posts", {
     method: "POST",
     body: post,
@@ -18,6 +24,7 @@ export const deletePost = async id => await useApi(`posts/${id}`, {
 export const getCommentsPost = async id => await useApi(`posts/${id}/comments`, {
     transform: res => res.data,
     default: () => [],
+    lazy: true,
     key: `get-comment-post-${id}`
 })
 
