@@ -108,27 +108,9 @@ const handleDeletePost = async () => {
         toast.value.push("Something Wrong");
     } else {
         toast.value.push("Success Delete Post");
-        emit("deletePost", post._id)
+        emit("deletePost", data.value)
     }
 }
-
-// const handlePostComment = async () => {
-//     const { data, error } = await commentPost(post._id, {
-//         comment: comment.value,
-//         images: ""
-//     });
-//     console.log(data.value, error.value)
-//     if (error.value) {
-//         toast.value.push("Something Went Wrong");
-//     } else {
-//         divComment.value.innerHTML = "";
-//         comment.value = "";
-//         comments.value.push(data.value);
-//         if (rooms.join(post._id)) {
-//             socket.value.emit("join-room", post._id)
-//         }
-//     }
-// }
 
 const isOverflowing = ref(false);
 const showLess = ref(false);

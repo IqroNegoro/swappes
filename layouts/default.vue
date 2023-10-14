@@ -6,22 +6,7 @@
             <slot />
             <div class="max-lg:hidden"></div>
         </div>
-        <Notification v-if="notification._id" />
-        <Toast v-if="toast.length" />
     </div>
 </template>
 <script setup>
-const toast = useToast();
-const notification = useNotification();
 </script>
-<style scoped>
-.page-enter-active,
-.page-leave-active {
-  transition: all 0.4s;
-}
-.page-enter-from,
-.page-leave-to {
-  opacity: 0;
-  filter: blur(1rem);
-}
-</style>

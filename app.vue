@@ -1,23 +1,40 @@
 <template>
     <NuxtLayout>
         <NuxtPage />
+        <Notification v-if="notification._id" />
+        <Toast />
     </NuxtLayout>
 </template>
 <script setup>
 const toast = useToast();
+const notification = useNotification();
+const user = userStore();
+const socket = useSocket();
+
 const handleStatus = e => {
-    console.log(e.type)
-    toast.value.push("It looks like you are offline")
+    if (e.type === "offline") {
+        toast.value.push("It looks like you are offline")
+    } else {
+        toast.value.push("Internet connection restored")
+    }
 }
 onMounted(() => {
     window.addEventListener("offline", handleStatus)
     window.addEventListener("online", handleStatus)
-    console.log("aku mounted!")
+    const audioNotification = new Audio("/sfx/notification.mp3")
+    socket.value.on("notification", newNotification => {
+        console.log(newNotification)
+        if (user._id != newNotification.from._id) {
+            notification.value = newNotification;
+            audioNotification.play();
+        }
+    });
 })
 
 onUnmounted(() => {
-    window.removeEventListener("offline", handleStatus)
-    window.removeEventListener("online", handleStatus)
+    window.removeEventListener("offline", handleStatus);
+    window.removeEventListener("online", handleStatus);
+    socket.value.off("notification");
 })
 </script>  
 <style>

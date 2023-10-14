@@ -10,10 +10,13 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         if (await refreshLogin()) {
         const user = userStore();
         const toast = useToast();
+        const socket = useSocket();
         toast.value.push("Please log-in first!");
+        if (socket.value) {
+            socket.value.disconnect();
+        }
         user.$reset();
         return navigateTo("/login");
     }
-    // refresh malah null token
     }
 })

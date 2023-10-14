@@ -1,14 +1,14 @@
 <template>
-    <div class="fixed  bg-black/50 top-0 left-0 w-full h-full flex justify-center items-center z-20" @click="$emit('closeSelectedPost')">
+    <div class="fixed bg-black/50 top-0 left-0 w-full h-full flex justify-center items-center z-20" @click="$emit('closeSelectedPost')">
         <Transition name="fade-up" appear mode="in-out">
-            <div ref="container" class="dark:bg-dark-primary dark:text-white relative md:rounded-md w-full md:w-1/2 h-full md:max-h-[85%] overflow-hidden bg-white flex flex-col" @click.stop>
+            <div ref="container" class="dark:bg-dark-primary dark:text-white relative md:rounded-md w-full md:w-3/4 lg:w-1/2 h-full md:max-h-[85%] overflow-hidden bg-white flex flex-col" @click.stop>
                 <div class="relative flex justify-center items-center py-4">
                     <p class="font-semibold">{{post.user.name}} post</p>
                     <button class="flex justify-center items-center absolute top-0 right-0 m-2 text-2xl" @click="$emit('closeSelectedPost')">
                         <i class="bx bx-x"></i>
                     </button>
                 </div>
-                <div class="flex flex-col w-full h-full overflow-y-scroll overscroll-contain rounded-scrollbar gap-2" ref="postContainer">
+                <div class="flex flex-col w-full h-full overflow-y-scroll overflow-x-hidden overscroll-contain rounded-scrollbar gap-2" ref="postContainer">
                     <div class="flex justify-between px-4 pt-2">
                         <div class="flex gap-2">
                             <NuxtLink :to="{name: 'users-id', params: {id: post.user._id}}">
@@ -81,7 +81,7 @@
                         </button>
                     </div>
                     <TransitionGroup appear tag="div" name="fade-up" class="p-4 flex flex-col gap-4" v-else-if="comments.length">
-                        <Comment v-for="comment in comments" :comment="comment" :key="comment._id" @delete-comment="id => comments = comments.filter(v => v._id != id)" />
+                        <Comment v-for="comment in comments" :comment="comment" :key="comment._id" @delete-comment="comment => comment.replyId ? comments = comments.filter(v => v._id == comment.replyId).reply.filter(v => v._id != comment._id) : comments = comments.filter(v => v._id != comment._id)" />
                         <!-- <div class="flex flex-row gap-2" v-for="comment in comments" :key="comment._id">
                             <NuxtLink class="text-sm font-semibold" :to="{name: 'users-id', params: {id: comment.user._id}}">
                                 <img :src="comment.user.avatar?.url" class="w-10 h-10 object-cover rounded-full">
@@ -103,15 +103,25 @@
                         Be the first who comment on this post
                     </div>
                 </div>
-                <div class="relative w-full rounded-md shadow-sm p-4 gap-4 flex justify-center items-center">
+                <div class="relative w-full rounded-md shadow-sm p-4 gap-4 flex justify-center items-center flex-nowrap">
                     <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-20" v-if="pendingSendComment"></div>
                     <img :src="user.avatar?.url" alt="" class="rounded-full w-8 h-8 object-cover">
-                    <div class="relative w-full">
-                        <div ref="divComment" contenteditable="true" placeholder="Write your comment..." class="cursor-pointer rounded-lg w-full text-left bg-black/10 px-4 py-2 font-light outline-none" @input="({target}) => comment = target.innerText" @keydown.ctrl.enter="handlePostComment" autofocus></div>
-                        <button class="absolute top-0 right-0 w-4 h-full flex justify-center items-center px-4" @click="handlePostComment">
+                    <div ref="divComment" contenteditable="true" placeholder="Write your comment..." class="min-h-[40px] max-h-48 overflow-y-auto cursor-pointer rounded-lg w-full text-left bg-black/10 px-4 py-2 font-light outline-none" @input="({target}) => comment = target.innerText" @keydown.ctrl.enter="handlePostComment" autofocus></div>
+                    <div class="flex">
+                        <label for="imagesInput" class="cursor-pointer flex justify-center items-center px-1 text-xl">
+                            <i class="bx bx-camera"></i>
+                        </label>
+                        <input ref="inputImage" type="file" name="image" accept=".jpg,.jpeg,.png,.webp" id="imagesInput" class="hidden" @input="handleInputFile">
+                        <button class="flex justify-center items-center px-1 text-xl" @click="handlePostComment">
                             <i class="bx bx-send"></i>
                         </button>
                     </div>
+                </div>
+                <div class="relative w-full flex justify-center items-center overscroll-contain" v-if="image">
+                    <button class="absolute dark:bg-dark-primary dark:text-white top-0 right-0 flex justify-center items-center px-1 bg-white rounded-full m-1" @click="() => {image = ''; inputImage.value = ''}">
+                        <i class="bx bx-x text-xl rounded-full"></i>
+                    </button>
+                    <img :src="renderImage(image)" class="w-32">
                 </div>
             </div>
         </Transition>
@@ -126,16 +136,32 @@ const user = userStore();
 const socket = useSocket();
 const rooms = roomsStore();
 const container = ref(undefined);
+const inputImage = ref(undefined);
 const divComment = ref(undefined);
+const image = ref(null);
 const postContainer = ref(undefined);
 const comment = ref('');
 
 const { data: comments, error: errorComments, pending: pendingComments, refresh: refreshComments } = await getCommentsPost(post._id);
+console.log(comments.value)
 const { data: like, error: errorLike, pending: pendingLike, execute: executeLike } = await likePost(post._id);
 pendingLike.value = false;
 
-const showSelectedPost = ref(false);
 const pendingSendComment = ref(false);
+
+const renderImage = file => URL.createObjectURL(file);
+
+const handleInputFile = ({target}) => {
+    const allowed = ["png", "jpg", "jpeg", "webp"]
+    if (!allowed.includes(target.files[0].type.split("/")[1])) {
+        toast.value.push("Please Select An Photo!");
+        image.value = '';
+        target.files = []
+        return;
+    }
+
+    image.value = target.files[0];
+}
 
 const handleLikePost = async () => {
     await executeLike();
@@ -153,17 +179,19 @@ const handleDeletePost = async () => {
     } else {
         toast.value.push("Success Delete Post");
         emit("deletePost", post._id)
+        emit("closeSelectedPost")
     }
 }
 
 const handlePostComment = async () => {
     if (!comment.value) return;
     pendingSendComment.value = true;
-    const { data, error } = await commentPost(post._id, {
-        comment: comment.value,
-        images: "",
-        post
-    });
+    console.log(comment.value)
+    let fd = new FormData();
+    fd.append("comment", comment.value)
+    fd.append("image", image.value)
+    fd.append("post", post)
+    const { data, error } = await commentPost(post._id, fd);
     pendingSendComment.value = false;
     if (error.value) {
         error.value.data.errors.forEach(v => {
@@ -171,10 +199,12 @@ const handlePostComment = async () => {
         })
     } else {
         if (!socket.value.connected) {
-            comments.value.push(comment)
+            comments.value.push(data.value)
         }
         divComment.value.innerHTML = "";
         comment.value = "";
+        image.value = "";
+        inputImage.value.value = []
         rooms.rooms.push(post._id);
         postContainer.value.scrollTop = postContainer.value.scrollHeight
     }
@@ -197,8 +227,8 @@ const escClick = ({code}) => {
 onMounted(() => {
     document.addEventListener("keydown", escClick)
     socket.value.emit("join-post", post._id);
-    socket.value.on("new-comment", comment => comments.value.push(comment));
-    socket.value.on("delete-comment", id => comments.value = comments.value.filter(v => v._id != id));
+    socket.value.on("new-comment", comment => comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply.push(comment) : comments.value.push(comment));
+    socket.value.on("delete-comment", comment => comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply = comments.value.find(v => v._id == comment.replyId).reply.filter(v => v._id != comment._id) : comments.value = comments.value.filter(v => v._id != comment._id));
 
     if (descriptionContainer.value.clientHeight < descriptionContainer.value.scrollHeight) {
         isOverflowing.value = true;

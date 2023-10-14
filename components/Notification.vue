@@ -8,7 +8,10 @@
                         <span class="font-semibold">
                             {{ notification.from.name }}
                         </span>
-                        {{ notification.content }}
+                        {{ notification.type == "comment" ? "has comment to post" : "" }}
+                        <span class="font-semibold">
+                            {{ notification.post.description }}
+                        </span>
                     </p>
                     <span class="text-slate-500 text-xs dark:text-white/75 font-semibold">{{ moment(notification.updatedAt).fromNow() }}</span>
                 </div>

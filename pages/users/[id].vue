@@ -69,10 +69,10 @@
                 <h1 class="text-xl mt-8 ">{{userData.name}}</h1>
             </div>
             <div class="max-md:-translate-y-28">
-                <NuxtLink :to="{name: 'login'}" class="text-center flex justify-center items-center gap-2 px-4 py-2 bg-black/50 hover:bg-black/75 transition-all duration-300 text-white mx-auto rounded-md" v-if="!user.authenticated">
+                <NuxtLink :to="{name: 'login'}" class="text-center flex justify-center items-center gap-2 px-4 py-2 bg-black/50 hover:bg-black/75 transition-all duration-300 text-white dark:bg-dark-secondary mx-auto rounded-md" v-if="!user.authenticated">
                     <i class="bx bx-user-plus text-2xl"></i> Add Friends
                 </NuxtLink>
-                <button class="flex justify-center items-center gap-2 px-4 py-2 bg-black/50 hover:bg-black/75 transition-all duration-300 text-white mx-auto rounded-md" v-if="user.authenticated && user._id != userData._id">
+                <button class="flex justify-center items-center gap-2 px-4 py-2 bg-black/50 hover:bg-black/75 transition-all duration-300 text-white mx-auto rounded-md dark:bg-dark-secondary" v-if="user.authenticated && user._id != userData._id" @click="handleFriendRequest">
                     <i class="bx bx-user-plus text-2xl"></i> Add Friends
                 </button>
             </div>
@@ -115,10 +115,6 @@ const banner = ref(null);
 
 const showFullBanner = ref(false);
 
-const handleFriendRequest = () => {
-    
-}
-
 const renderImage = file => URL.createObjectURL(file);
 
 const { data: userData, error: userError, pending: pendingUser, refresh: refreshUser } = await getUserById(id);
@@ -133,6 +129,10 @@ const pendingAvatar = ref(false);
 const pendingBanner = ref(false);
 
 console.log(userData.value, posts.value)
+
+const handleFriendRequest = () => {
+    console.log("asdasdasd")
+}
 
 const handleAvatarFilter = ({target}) => {
     if (!target.files.length) {

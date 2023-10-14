@@ -31,7 +31,7 @@
 <script setup>
 const user = userStore();
 const { data: posts, pending, error, refresh } = await getPosts();
-
+console.log(posts.value)
 const createPostStatus = ref(false);
 const postingStatus = ref(false);
 
