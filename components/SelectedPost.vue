@@ -143,7 +143,6 @@ const postContainer = ref(undefined);
 const comment = ref('');
 
 const { data: comments, error: errorComments, pending: pendingComments, refresh: refreshComments } = await getCommentsPost(post._id);
-console.log(comments.value)
 const { data: like, error: errorLike, pending: pendingLike, execute: executeLike } = await likePost(post._id);
 pendingLike.value = false;
 
@@ -186,7 +185,6 @@ const handleDeletePost = async () => {
 const handlePostComment = async () => {
     if (!comment.value) return;
     pendingSendComment.value = true;
-    console.log(comment.value)
     let fd = new FormData();
     fd.append("comment", comment.value)
     fd.append("image", image.value)

@@ -23,7 +23,6 @@ onMounted(() => {
     window.addEventListener("online", handleStatus)
     const audioNotification = new Audio("/sfx/notification.mp3")
     socket.value.on("notification", newNotification => {
-        console.log(newNotification)
         if (user._id != newNotification.from._id) {
             notification.value = newNotification;
             audioNotification.play();

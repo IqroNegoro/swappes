@@ -1,5 +1,4 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
-    console.log(process.client, process.server)
     if (process.client) {
         document.documentElement.classList.add("dark")
     }

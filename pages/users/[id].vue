@@ -128,10 +128,7 @@ const { data: posts, error: errorPosts, pending: pendingPosts, refresh: refreshP
 const pendingAvatar = ref(false);
 const pendingBanner = ref(false);
 
-console.log(userData.value, posts.value)
-
 const handleFriendRequest = () => {
-    console.log("asdasdasd")
 }
 
 const handleAvatarFilter = ({target}) => {
@@ -165,14 +162,12 @@ const handleBannerFilter = ({target}) => {
 }
 
 const handleBanner = async () => {
-    console.log("kenapa gw ke eksekusi blog")
     pendingBanner.value = true;
     let formData = new FormData();
     formData.append("banner", banner.value);
     const { data, error, pending } = await uploadBanner(formData);
     pendingBanner.value = pending.value
     if (error.value) {
-        console.log(error.value)
         toast.value.push("Cannot upload banner");
         return;
     }
@@ -193,7 +188,6 @@ const handleAvatar = async () => {
     const { data, error, pending } = await uploadAvatar(formData);
     pendingAvatar.value = pending.value
     if (error.value) {
-        console.log(error.value)
         toast.value.push("Cannot upload avatar");
         return;
     }

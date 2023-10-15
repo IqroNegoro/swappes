@@ -40,7 +40,8 @@
 </template>
 <script setup>
 const email = ref("iqronegoro0@gmail.com");
-const password = ref(process.env === "production" ? "iqrodesu" : "iqronegoro");
+const NODE_ENV = process.env
+const password = ref(NODE_ENV === "production" ? "iqrodesu" : "iqronegoro");
 const user = userStore();
 const toast = useToast();
 let {data, error, pending} = ref({});
@@ -50,7 +51,6 @@ const handleLogin = async () => {
     ({data, error, pending} = await login(email.value, password.value));
     
     if (error.value) {
-        console.log(error.value)
         if (error.value.statusCode == 404) {
             toast.value.push(error.value.data.message)
             return;

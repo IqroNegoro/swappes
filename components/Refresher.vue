@@ -14,7 +14,6 @@ let pos = {
 
 const handleMouseUp = () => {
     refreshIndicator.value.style.top = `${pos.elY}px`
-    console.log(refreshIndicator.value.getBoundingClientRect().top)
     pos.y = 0;
     document.removeEventListener("mousemove", handleMoveMouse)
     document.removeEventListener("mouseup", handleMouseUp)

@@ -82,7 +82,6 @@ const handlePostReply = async () => {
         images: "",
         replyId: comment.replyId ? comment.replyId : comment._id
     });
-    console.log(data.value)
     pendingSendReply.value = false;
     if (error.value) {
         error.value.data.errors.forEach(v => {
@@ -103,7 +102,6 @@ pending.value = false;
 const handleDeleteComment = async () => {
     pending.value = true;
     await execute();
-    console.log(data.value)
     if (error.value) {
         toast.value.push("Something went wrong");
     } else {

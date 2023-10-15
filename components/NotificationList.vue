@@ -16,5 +16,4 @@
 <script setup>
 import moment from "moment";
 const { notification } = defineProps(["notification"]);
-console.log(notification)
 </script>
