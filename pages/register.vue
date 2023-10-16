@@ -41,9 +41,10 @@
     </div>
 </template>
 <script setup>
-const name = ref("Emilico Chan");
-const email = ref("emilico@gmail.com");
-const password = ref("emilico");
+const NODE_ENV = process.env.NODE_ENV
+const name = ref(NODE_ENV == "production" ? "" : "Emilico");
+const email = ref(NODE_ENV == "production" ? "" : "emilico@gmail.com");
+const password = ref(NODE_ENV == "production" ? "" : "emilico");
 const toast = useToast();
 let {data, error, pending} = {};
 

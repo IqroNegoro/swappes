@@ -39,10 +39,9 @@
     </div>
 </template>
 <script setup>
-const email = ref("iqronegoro0@gmail.com");
 const NODE_ENV = process.env.NODE_ENV
-console.log(NODE_ENV)
-const password = ref(NODE_ENV === "production" ? "iqrodesu" : "iqronegoro");
+const email = ref(NODE_ENV === "production" ? "" : "iqronegoro0@gmail.com");
+const password = ref(NODE_ENV === "production" ? "" : "iqronegoro");
 const user = userStore();
 const toast = useToast();
 let {data, error, pending} = ref({});
