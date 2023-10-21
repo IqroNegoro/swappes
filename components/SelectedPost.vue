@@ -2,6 +2,8 @@
     <div class="fixed bg-black/50 top-0 left-0 w-full h-full flex justify-center items-center z-20" @click="$emit('closeSelectedPost')">
         <Transition name="fade-up" appear mode="in-out">
             <div ref="container" class="dark:bg-dark-primary dark:text-white relative md:rounded-md w-full md:w-3/4 lg:w-1/2 h-full md:max-h-[85%] overflow-hidden bg-white flex flex-col" @click.stop>
+                <SelectedPostSkeleton v-if="pendingPost" />
+                <template v-else>
                 <div class="relative flex justify-center items-center py-4">
                     <p class="font-semibold">{{post.user.name}} post</p>
                     <button class="flex justify-center items-center absolute top-0 right-0 m-2 text-2xl" @click="$emit('closeSelectedPost')">
@@ -56,7 +58,6 @@
                         <i class="bx bx-like"></i> {{ post.likes.length }}
                         <i class="bx bx-chat"></i> {{ comments.length }}
                     </div>
-                    
                     <div class="flex flex-row justify-between p-2 dark:border-white/10 border-y border-black/10">
                         <button class="action-post" @click="handleLikePost">
                             <i class='bx bx-loader-alt bx-spin' v-if="pendingLike"></i>
@@ -82,21 +83,6 @@
                     </div>
                     <TransitionGroup appear tag="div" name="fade-up" class="p-4 flex flex-col gap-4" v-else-if="comments.length">
                         <Comment v-for="comment in comments" :comment="comment" :key="comment._id" @delete-comment="comment => comment.replyId ? comments = comments.filter(v => v._id == comment.replyId).reply.filter(v => v._id != comment._id) : comments = comments.filter(v => v._id != comment._id)" />
-                        <!-- <div class="flex flex-row gap-2" v-for="comment in comments" :key="comment._id">
-                            <NuxtLink class="text-sm font-semibold" :to="{name: 'users-id', params: {id: comment.user._id}}">
-                                <img :src="comment.user.avatar?.url" class="w-10 h-10 object-cover rounded-full">
-                            </NuxtLink>
-                            <div class="flex flex-col gap-1">
-                                <div class="dark:bg-dark-secondary rounded-md bg-black/10 px-2 py-1">
-                                    <NuxtLink class="text-sm font-semibold" :to="{name: 'users-id', params: {id: comment.user._id}}">{{comment.user.name}}</NuxtLink>
-                                    <p class="text-sm text-justify" v-html="comment.comment"></p>
-                                </div>
-                                <div class="flex gap-4 px-2">
-                                    <button class="text-xs">Reply</button>
-                                    <button class="text-xs" v-if="comment.user._id == user._id" @click="handleDeleteComment">Delete</button>
-                                </div>
-                            </div>
-                        </div> -->
                     </TransitionGroup>
                     <div v-else class="flex flex-col justify-center items-center my-16 gap-2">
                         <i class='bx bx-chat text-5xl'></i>
@@ -123,6 +109,7 @@
                     </button>
                     <img :src="renderImage(image)" class="w-32">
                 </div>
+                </template>
             </div>
         </Transition>
     </div>
@@ -130,7 +117,7 @@
 <script setup>
 import moment from "moment";
 const emit = defineEmits(["deletePost", "likePost", "closeSelectedPost"]);
-const { post } = defineProps(["post"]);
+const { id } = defineProps(["id"]);
 const toast = useToast();
 const user = userStore();
 const socket = useSocket();
@@ -142,8 +129,9 @@ const image = ref(null);
 const postContainer = ref(undefined);
 const comment = ref('');
 
-const { data: comments, error: errorComments, pending: pendingComments, refresh: refreshComments } = await getCommentsPost(post._id);
-const { data: like, error: errorLike, pending: pendingLike, execute: executeLike } = await likePost(post._id);
+const { data: post, error: errorPost, pending: pendingPost, refresh: refreshPost } = await getPost(id, {lazy: true});
+const { data: comments, error: errorComments, pending: pendingComments, refresh: refreshComments } = await getCommentsPost(id);
+const { data: like, error: errorLike, pending: pendingLike, execute: executeLike } = await likePost(id);
 pendingLike.value = false;
 
 const pendingSendComment = ref(false);
@@ -167,17 +155,17 @@ const handleLikePost = async () => {
     if (errorLike.value) {
         toast.value.push("Something went wrong when liking post");
     } else {
-        emit("likePost", like.value);
+        post.value.likes = like.value.likes
     }
 }
 
 const handleDeletePost = async () => {
-    const { data, error } = await deletePost(post._id);
+    const { data, error } = await deletePost(post.value._id);
     if (error.value) {
         toast.value.push("Something Wrong");
     } else {
         toast.value.push("Success Delete Post");
-        emit("deletePost", post._id)
+        emit("deletePost", post.value._id)
         emit("closeSelectedPost")
     }
 }
@@ -188,8 +176,7 @@ const handlePostComment = async () => {
     let fd = new FormData();
     fd.append("comment", comment.value)
     fd.append("image", image.value)
-    fd.append("post", post)
-    const { data, error } = await commentPost(post._id, fd);
+    const { data, error } = await commentPost(post.value._id, fd);
     pendingSendComment.value = false;
     if (error.value) {
         error.value.data.errors.forEach(v => {
@@ -203,7 +190,7 @@ const handlePostComment = async () => {
         comment.value = "";
         image.value = "";
         inputImage.value.value = []
-        rooms.rooms.push(post._id);
+        rooms.join(post.value._id);
         postContainer.value.scrollTop = postContainer.value.scrollHeight
     }
 }
@@ -224,19 +211,19 @@ const escClick = ({code}) => {
 
 onMounted(() => {
     document.addEventListener("keydown", escClick)
-    socket.value.emit("join-post", post._id);
+    socket.value.emit("join-post", post.value._id);
     socket.value.on("new-comment", comment => comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply.push(comment) : comments.value.push(comment));
     socket.value.on("delete-comment", comment => comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply = comments.value.find(v => v._id == comment.replyId).reply.filter(v => v._id != comment._id) : comments.value = comments.value.filter(v => v._id != comment._id));
 
-    if (descriptionContainer.value.clientHeight < descriptionContainer.value.scrollHeight) {
+    if (descriptionContainer.value?.clientHeight < descriptionContainer.value?.scrollHeight) {
         isOverflowing.value = true;
     }
 })
 
 onUnmounted(() => {
     document.removeEventListener("keydown", escClick)
-    if (!rooms.joined(post._id)) {
-        socket.value.emit("leave-post", post._id);
+    if (!rooms.has(post.value._id)) {
+        socket.value.emit("leave-post", post.value._id);
     }
     socket.value.off("new-comment");
     socket.value.off("delete-comment");

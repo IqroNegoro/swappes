@@ -3,6 +3,7 @@ export const roomsStore = defineStore("rooms", ({
         rooms: []
     }),
     actions: {
-        joined: function(id) {return this.rooms.indexOf(id) >= 0}
+        join: function(id) {return this.rooms.indexOf(id) >= 0 ? "" : this.rooms.push(id)},
+        has: function(id) {return this.rooms.indexOf(id) >= 0}
     }
 }))

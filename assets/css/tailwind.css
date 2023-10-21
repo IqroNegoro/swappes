@@ -62,4 +62,8 @@
     .dark-hover {
         @apply bg-white/10
     }
+
+    .skeleton {
+        @apply animate-pulse dark:bg-white/10 bg-black/10 rounded-full;
+    }
 }

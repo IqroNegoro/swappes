@@ -6,7 +6,7 @@ export default defineNuxtConfig({
     "@pinia/nuxt"
   ],
   app: {
-    pageTransition: { name: 'page', mode: 'out-in', appear: true },
+    // pageTransition: { name: 'page', mode: 'out-in', appear: true },
     head: {
       link: [
         {

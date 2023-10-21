@@ -4,10 +4,11 @@ export const getPosts = async () => await useApi("posts", {
     key: "get-post"
 })
 
-export const getPost = async id => await useApi(`posts/${id}`, {
+export const getPost = async (id, options = {}) => await useApi(`posts/${id}`, {
+    ...options,
     transform: res => res.data,
     default: () => [],
-    key: `get-post-{id}`
+    key: `get-post-${id}`
 })
 
 export const createPost = async post => await useApi("posts", {

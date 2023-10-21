@@ -2,7 +2,7 @@
     <div class="dark:bg-dark dark:text-white w-full h-screen grid grid-cols-1 md:grid-cols-2 grid-rows-1">
         <div class="flex flex-col justify-between items-center md:items-start p-2">
             <div class="text-left">
-                <p class="text-lg first-letter:text-4xl">Swappess</p>
+                <p class="text-lg first-letter:text-4xl">Swappes</p>
             </div>
             <form class="flex flex-col gap-2 mx-auto md:w-3/4" @submit.prevent="handleLogin">
                 <h1 class="font-bold max-md:text-center text-3xl tracking-wider">Mari Masuk</h1>
@@ -19,8 +19,13 @@
                         <input type="password" class="w-full bg-transparent" placeholder="Enter Your Password" v-model="password">
                     </div>
                 </div>
-                <button class="disabled:cursor-not-allowed w-full bg-black/10 dark:bg-white/20 duration-150 dark:hover:bg-white/40 rounded-md p-2" type="submit" @submit.prevent="handleLogin" :disabled="pending">
-                    <i v-if="pending" class="bx bx-loading"></i>
+                <ul v-if="errorLogin" class="list-disc">
+                    <li v-for="(error, i) in errorLogin" :key="i">
+                        {{ error }}
+                    </li>
+                </ul>
+                <button class="disabled:cursor-not-allowed flex justify-center items-center w-full bg-black/10 dark:bg-white/20 duration-150 dark:hover:bg-white/40 rounded-md p-2" type="submit" @submit.prevent="handleLogin" :disabled="pending">
+                    <i v-if="pending" class='bx bx-loader-alt bx-spin' ></i>
                     <p v-else>
                         Masuk
                     </p>
@@ -29,7 +34,7 @@
             </form>
             <div class="">
                 <p class="text-xs">
-                    &copy; Swappess 2023
+                    &copy; Swappes 2023
                 </p>
             </div>
         </div>
@@ -43,29 +48,20 @@ const NODE_ENV = process.env.NODE_ENV
 const email = ref(NODE_ENV === "production" ? "" : "iqronegoro0@gmail.com");
 const password = ref(NODE_ENV === "production" ? "" : "iqronegoro");
 const user = userStore();
-const toast = useToast();
-let {data, error, pending} = ref({});
+const pending = ref(false);
+const errorLogin = ref()
 
 const handleLogin = async () => {
-    toast.value = [];
-    ({data, error, pending} = await login(email.value, password.value));
-    
+    if (!email.value || !password.value) return;
+
+    pending.value = true;
+    errorLogin.value = "";
+
+    const {data, error} = await login(email.value, password.value);
+
     if (error.value) {
-        if (error.value.statusCode == 404) {
-            toast.value.push(error.value.data.message)
-            return;
-        }
-        if (error.value.data) {
-            if (error.value.data.message) {
-                toast.value.push(error.value.data.message);
-            }
-            
-            if (error.value.data.errors) {
-                toast.value = error.value.data
-            }
-        } else {
-            toast.value.push(`Something Went Wrong (code: ${error.value.statusCode})`)
-        }
+        pending.value = false
+        errorLogin.value = error.value.data.errors
         return;
     }
 
@@ -75,6 +71,7 @@ const handleLogin = async () => {
     })
 
     return navigateTo("/");
+    pending.value = false;
 }
 
 if (!await refreshLogin()) navigateTo("/");

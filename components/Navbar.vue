@@ -49,10 +49,10 @@
                         <i class='bx bx-user-circle'></i>
                         My Profiles
                     </NuxtLink>
-                    <NuxtLink to="" class="dark:text-inherit text-black py-2">
+                    <!-- <NuxtLink to="" class="dark:text-inherit text-black py-2">
                         <i class='bx bx-cog'></i>
                         Settings
-                    </NuxtLink>
+                    </NuxtLink> -->
                     <button class="dark:text-inherit text-black pt-2" @click="logout">
                         <i class='bx bx-log-out'></i>
                         Log Out

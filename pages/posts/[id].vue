@@ -196,7 +196,7 @@ useHead({
 })
 
 onMounted(() => {
-    if (!rooms.joined(id)) {
+    if (!rooms.has(id)) {
         socket.value.emit("join-post", id);
     }
     socket.value.on("new-comment", comment => comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply.push(comment) : comments.value.push(comment));
@@ -208,7 +208,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-    if (!rooms.joined(id)) {
+    if (!rooms.has(id)) {
         socket.value.emit("leave-post", id);
     }
     socket.value.off("new-comment");

@@ -1,7 +1,9 @@
 <template>
-    <div class="fixed bg-black/50 top-0 left-0 w-full h-screen flex justify-center items-center overflow-auto z-20" @click.self="$emit('closeCreatePostStatus')">
+    <div class="fixed bg-black/50 top-0 left-0 w-full h-screen flex justify-center items-center overflow-auto z-20">
         <div class="rounded-md w-full md:w-1/2 dark:bg-dark-primary dark:text-white bg-white flex flex-col p-1 relative">
-            <div class="absolute top-0 left-0 w-full h-full bg-white/50 z-30" v-if="pending"></div>
+            <div class="absolute top-0 left-0 flex justify-center items-center w-full h-full bg-white/10 z-50" v-if="pending">
+                <i class="bx bx-loader-alt bx-spin text-5xl"></i>
+            </div>
             <div class="text-right flex justify-between items-center flex-row p-2">
                 <div></div>
                 <h1 class="font-bold text-xl">Create Post</h1>
@@ -17,7 +19,7 @@
                 </div>
             </div>
             <div class="min-h-[8rem] max-h-96 overflow-y-auto">
-                <div contenteditable="true" ref="textarea" class="outline-none px-2 mb-4 z-10 min-h-[8rem]" @input="({target}) => description = target.innerText"></div>
+                <div contenteditable="true" ref="textarea" class="outline-none px-2 mb-4 z-10 min-h-[8rem]" @keydown.ctrl.enter="handlePost" @input="({target}) => description = target.innerText"></div>
                 <div v-if="images.length" class="grid gap-1 rounded-xl overflow-hidden" :class="{'grid-cols-1 grid-rows-1': images.length == 1, 'grid-cols-2 grid-rows-1': images.length == 2, 'grid-cols-2 grid-rows-2': images.length == 3, 'grid-cols-2 grid-rows-2': images.length == 4}">
                     <div class="relative" v-for="(image, i) in images" :key="i" :class="{'col-span-2': i == 0 && images.length == 3}">
                         <button class="absolute dark:bg-dark-primary dark:text-white top-0 right-0 flex justify-center items-center px-1 bg-white rounded-full m-1" @click="images.splice(i, 1)">
@@ -32,7 +34,7 @@
                 Add Images Up To 4 Images
             </label>
             <input type="file" multiple name="images[]" accept=".jpg,.jpeg,.png,.webp" id="imagesInput" class="hidden" @input="handleInputFile">
-            <button class="mx-auto w-1/2 py-2 text-white text-xl font-semibold dark:bg-dark-secondary dark:hover:bg-white/30 bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm" :disabled="pending" @click="handlePost">
+            <button class="dark:disabled:bg-transparent disabled:cursor-not-allowed mx-auto w-1/2 py-2 text-white text-xl font-semibold dark:bg-dark-secondary dark:hover:bg-white/30 bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm" :disabled="pending || !(description || images.length)" @click="handlePost">
                 Post
             </button>
         </div>
@@ -40,9 +42,10 @@
 </template>
 <script setup>
 const user = userStore();
-const emit = defineEmits(["newPost", "postingStatus", "closeCreatePostStatus"])
+const emit = defineEmits(["newPost", "closeCreatePostStatus"])
 const toast = useToast();
-let { data, pending, error, refresh } = {};
+const pending = ref(false);
+const errors = ref("")
 const textarea = ref(null);
 const description = ref("");
 const images = ref([]);
@@ -51,6 +54,7 @@ const renderImage = file => URL.createObjectURL(file);
 
 const handleInputFile = ({target}) => {
     let files = [...target.files];
+    target.value = ""
     if (files.length) {
         if (files.length > 4) {
             toast.value.push("Cannot select images more than 4!");
@@ -72,15 +76,17 @@ const handleInputFile = ({target}) => {
 }
 
 const handlePost = async () => {
-    toast.value.push("Posting your post...");
-    emit("closeCreatePostStatus");
-    emit("postingStatus", true);
+    if (!description.value) return;
+    pending.value = true;
     let formData = new FormData();
     formData.append("description", description.value);
+
     for (let file of images.value) {
         formData.append("images", file)
     }
-    ({ data, pending, error, refresh } = await createPost(formData));
+
+    const { data, error } = await createPost(formData);
+
     if (error.value) {
         toast.value.push("Something Went Wrong");
     } else {
@@ -89,7 +95,8 @@ const handlePost = async () => {
         images.value = [];
         description.value = "";
         textarea.value.innerText = "";
+        emit("closeCreatePostStatus")
     }
-    emit("postingStatus", false);
+    pending.value = false;
 }
 </script>
