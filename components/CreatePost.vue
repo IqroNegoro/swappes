@@ -76,7 +76,7 @@ const handleInputFile = ({target}) => {
 }
 
 const handlePost = async () => {
-    if (!description.value) return;
+    if (pending.value || !(description || images.length)) return;
     pending.value = true;
     let formData = new FormData();
     formData.append("description", description.value);

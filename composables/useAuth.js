@@ -22,6 +22,7 @@ export const refreshLogin = async () => {
         method: "POST",
         key: "refresh",
     })
+    
     if (error.value) return true;
     const user = userStore();
     user.$patch({

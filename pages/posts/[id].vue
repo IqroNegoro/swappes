@@ -1,18 +1,18 @@
 <template>
-    <div class="flex flex-col lg:flex-row dark:bg-dark h-screen">
-        <div class="w-full md:h-screen flex justify-center items-center relative lg:overflow-y-auto">
+    <div class="flex flex-col lg:flex-row overflow-hidden dark:bg-dark md:h-screen">
+        <div class="w-full flex justify-center items-center relative">
             <button @click="$router.back()" class="absolute top-0 left-0 m-2 px-1 flex justify-center items-center bg-dark-primary/50 hover:bg-dark-primary duration-150 transition-all hover:scale-105 rounded-full">
                 <i class="bx bx-x dark:text-white text-2xl"></i>
             </button>
             <button class="absolute top-1/2 -translate-y-1/2 left-0 p-2 ml-1 flex justify-center items-center bg-dark-primary/50 hover:bg-dark-primary duration-150 transition-all hover:scale-105" v-if="post.images.length > 1" @click="indexImage == 0 ? indexImage = post.images.length - 1 : indexImage--">
                 <i class='bx bxs-chevron-left text-xs md:text-3xl dark:text-white'></i>
             </button>
-            <img :src="post.images[indexImage].images" :key="post.images[indexImage].discordId" alt="" class="max-w-full">
+            <img :src="post.images[indexImage].images" :key="post.images[indexImage].discordId" alt="" class="w-full h-full object-contain">
             <button class="absolute top-1/2 -translate-y-1/2 right-0 p-2 mr-1 flex justify-center items-center bg-dark-primary/50 hover:bg-dark-primary duration-150 transition-all hover:scale-105" v-if="post.images.length > 1" @click="indexImage == post.images.length - 1 ? indexImage = 0 : indexImage++">
                 <i class='bx bxs-chevron-right text-xs md:text-3xl dark:text-white'></i>
             </button>
         </div>
-        <div class="w-full lg:w-[28rem] h-full flex flex-col px-2 dark:bg-dark">
+        <div class="w-full lg:w-[36rem] h-full flex flex-col px-2 dark:bg-dark">
             <div class="flex flex-col w-full h-full pt-4 dark:text-white overflow-y-scroll overscroll-contain rounded-scrollbar gap-2" ref="postContainer">
                 <div class="flex justify-between px-4">
                     <div class="flex gap-2">
@@ -102,15 +102,25 @@
                     Be the first who comment on this post
                 </div>
             </div>
-            <div class="relative w-full rounded-md shadow-sm p-4 gap-4 flex justify-center items-center">
+            <div class="relative w-full rounded-md shadow-sm p-4 gap-4 flex justify-center items-center flex-nowrap">
                 <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-20" v-if="pendingSendComment"></div>
-                <img :src="user.avatar?.url" alt="" class="rounded-full w-8 h-8 object-cover">
-                <div class="relative w-full">
-                    <div ref="divComment" contenteditable="true" placeholder="Write your comment..." class="cursor-pointer rounded-lg w-full text-left bg-black/10 px-4 py-2 font-light outline-none dark:text-white" @input="({target}) => comment = target.innerText" @keydown.ctrl.enter="handlePostComment" autofocus></div>
-                    <button class="absolute top-0 right-0 w-4 h-full flex justify-center items-center px-4" @click="handlePostComment">
-                        <i class="bx bx-send dark:text-white"></i>
+                <img :src="user.avatar?.url" alt="" class="rounded-full w-8 h-8 object-cover aspect-square">
+                <div ref="divComment" contenteditable="true" placeholder="Write your comment..." class="min-h-[40px] max-h-48 overflow-y-auto cursor-pointer rounded-lg w-full text-left bg-black/10 px-4 py-2 font-light outline-none" @input="({target}) => comment = target.innerText" @keydown.ctrl.enter="handlePostComment" autofocus></div>
+                <div class="flex dark:text-white">
+                    <label for="imagesInput" class="cursor-pointer flex justify-center items-center px-1 text-xl">
+                        <i class="bx bx-camera"></i>
+                    </label>
+                    <input ref="inputImage" type="file" name="image" accept=".jpg,.jpeg,.png,.webp" id="imagesInput" class="hidden" @input="handleInputFile">
+                    <button class="flex justify-center items-center px-1 text-xl" @click="handlePostComment">
+                        <i class="bx bx-send"></i>
                     </button>
                 </div>
+            </div>
+            <div class="relative w-full flex justify-center items-center overscroll-contain" v-if="image">
+                <button class="absolute dark:bg-dark-primary dark:text-white top-0 right-0 flex justify-center items-center px-1 bg-white rounded-full m-1" @click="() => {image = ''; inputImage.value = ''}">
+                    <i class="bx bx-x text-xl rounded-full"></i>
+                </button>
+                <img :src="renderImage(image)" class="w-32">
             </div>
         </div>
     </div>
@@ -134,10 +144,25 @@ const descriptionContainer = ref(undefined);
 const divComment = ref(undefined);
 const comment = ref("");
 const rooms = roomsStore();
+const image = ref(null);
 
 const isOverflowing = ref(false);
 const showPostMenu = ref(false);
 const pendingSendComment = ref(false);
+
+const renderImage = file => URL.createObjectURL(file);
+
+const handleInputFile = ({target}) => {
+    const allowed = ["png", "jpg", "jpeg", "webp"]
+    if (!allowed.includes(target.files[0].type.split("/")[1])) {
+        toast.value.push("Please Select An Photo!");
+        image.value = '';
+        target.files = []
+        return;
+    }
+
+    image.value = target.files[0];
+}
 
 const handleLikePost = async () => {
     await executeLike();
@@ -151,11 +176,10 @@ const handleLikePost = async () => {
 const handlePostComment = async () => {
     if (!comment.value) return;
     pendingSendComment.value = true;
-    const { data, error } = await commentPost(id, {
-        comment: comment.value,
-        images: "",
-        post
-    });
+    let fd = new FormData();
+    fd.append("comment", comment.value)
+    fd.append("image", image.value)
+    const { data, error } = await commentPost(post.value._id, fd);
     pendingSendComment.value = false;
     if (error.value) {
         error.value.data.errors.forEach(v => {
@@ -163,11 +187,13 @@ const handlePostComment = async () => {
         })
     } else {
         if (!socket.value.connected) {
-            comments.value.push(comment)
+            comments.value.push(data.value)
         }
         divComment.value.innerHTML = "";
         comment.value = "";
-        rooms.rooms.push(id);
+        image.value = "";
+        inputImage.value.value = []
+        rooms.join(post.value._id);
         postContainer.value.scrollTop = postContainer.value.scrollHeight
     }
 }

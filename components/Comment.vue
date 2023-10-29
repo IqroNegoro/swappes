@@ -22,14 +22,14 @@
                 </div>
             </div>
         </div>
-        <div v-if="comment.reply?.length" class="flex flex-col gap-2 w-full pl-12">
+        <TransitionGroup tag="div" name="fade-up" v-if="comment.reply?.length" class="flex flex-col gap-2 w-full pl-12">
             <Comment v-for="comment in comment.reply" :comment="comment" :key="comment._id" @delete-comment="id => comment = comment.filter(v => v._id != id)" />
-        </div>
+        </TransitionGroup>
         <div class="relative w-full pl-12 rounded-md shadow-sm flex flex-col gap-1" v-if="reply">
             <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-20" v-if="pendingSendReply"></div>
             <p class="text-xs">Replying to <span class="font-semibold"> {{ comment.user.name }} </span> </p>
             <div class="flex justify-center items-center flex-nowrap gap-4">
-                <img :src="user.avatar?.url" alt="" class="rounded-full w-8 h-8 object-cover">
+                <img :src="user.avatar?.url" alt="" class="rounded-full w-8 h-8 object-cover aspect-square">
                 <div ref="replyComment" contenteditable="true" placeholder="Write your reply..." class="min-h-[40px] max-h-48 overflow-y-auto cursor-pointer rounded-lg w-full text-left bg-black/10 px-4 py-2 font-light outline-none" @keydown.ctrl.enter="handlePostReply" autofocus></div>
                 <div class="flex">
                     <label for="imagesInput" class="cursor-pointer flex justify-center items-center px-1 text-xl">
@@ -117,3 +117,16 @@ const handleDeleteComment = async () => {
     pending.value = false;
 }
 </script>
+<style scoped>
+.fade-up-enter-active,
+.fade-up-leave-active {
+  transition: all 0.5s ease;
+}
+
+.fade-up-enter-from,
+.fade-up-leave-to {
+  opacity: 0;
+  transform: translateY(20px)
+}
+
+</style>

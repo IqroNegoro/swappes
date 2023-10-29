@@ -70,7 +70,6 @@ const handleRegister = async () => {
     }
 
     return navigateTo("/login");
-    pending.value = false
 }
 
 if (!await refreshLogin()) navigateTo("/");

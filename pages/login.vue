@@ -71,10 +71,7 @@ const handleLogin = async () => {
     })
 
     return navigateTo("/");
-    pending.value = false;
 }
-
-if (!await refreshLogin()) navigateTo("/");
 
 definePageMeta({
     layout: false

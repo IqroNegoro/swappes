@@ -103,7 +103,6 @@ const handleLikePost = async () => {
 
 const handleDeletePost = async () => {
     const { data, error } = await deletePost(post._id);
-    console.log(data.value)
     if (error.value) {
         toast.value.push("Something Wrong");
     } else {

@@ -10,7 +10,7 @@
                         </span>
                         {{ notification.type == "comment" ? "has comment to post" : "" }}
                         <span class="font-semibold">
-                            {{ notification.post.description }}
+                            {{ notification.post.description.slice(0,10) }}...
                         </span>
                     </p>
                     <span class="text-slate-500 text-xs dark:text-white/75 font-semibold">{{ moment(notification.updatedAt).fromNow() }}</span>

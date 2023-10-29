@@ -1,7 +1,7 @@
 export const getPosts = async () => await useApi("posts", {
     transform: res => res.data,
     default: () => [],
-    key: "get-post"
+    key: "get-posts",
 })
 
 export const getPost = async (id, options = {}) => await useApi(`posts/${id}`, {

@@ -26,6 +26,29 @@ export const uploadBanner = async banner => await useApi(`users/banner`, {
     key: "upload-user-banner"
 })
 
-export const addFriendRequest = async id => {
-    
-}
+export const getUserFriends = async id => await useApi(`users/${id}/friends`, {
+    transform: res => res.data,
+    default: () => [],
+    key: `get-${id}-friends`
+})
+
+export const friendRequest = async id => await useApi(`users/${id}/friends`, {
+    method: "POST",
+    transform: res => res.data,
+    immediate: false,
+    key: `friend-request-${id}`
+})
+
+export const acceptFriendRequest = async id => await useApi(`users/${id}/friends`, {
+    method: "PUT",
+    transform: res => res.data,
+    immediate: false,
+    key: `accept-friend-request-${id}`
+})
+
+export const deleteFriend = async id => await useApi(`users/${id}/friends`, {
+    method: "DELETE",
+    transform: res => res.data,
+    immediate: false,
+    key: `delete-friend-${id}`
+})

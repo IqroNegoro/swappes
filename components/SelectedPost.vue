@@ -91,7 +91,7 @@
                 </div>
                 <div class="relative w-full rounded-md shadow-sm p-4 gap-4 flex justify-center items-center flex-nowrap">
                     <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-20" v-if="pendingSendComment"></div>
-                    <img :src="user.avatar?.url" alt="" class="rounded-full w-8 h-8 object-cover">
+                    <img :src="user.avatar?.url" alt="" class="rounded-full w-8 h-8 object-cover aspect-square">
                     <div ref="divComment" contenteditable="true" placeholder="Write your comment..." class="min-h-[40px] max-h-48 overflow-y-auto cursor-pointer rounded-lg w-full text-left bg-black/10 px-4 py-2 font-light outline-none" @input="({target}) => comment = target.innerText" @keydown.ctrl.enter="handlePostComment" autofocus></div>
                     <div class="flex">
                         <label for="imagesInput" class="cursor-pointer flex justify-center items-center px-1 text-xl">
@@ -212,7 +212,7 @@ const escClick = ({code}) => {
 onMounted(() => {
     document.addEventListener("keydown", escClick)
     socket.value.emit("join-post", post.value._id);
-    socket.value.on("new-comment", comment => comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply.push(comment) : comments.value.push(comment));
+    socket.value.on("new-comment", comment => comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply.push(comment) : comments.value.push(comment))
     socket.value.on("delete-comment", comment => comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply = comments.value.find(v => v._id == comment.replyId).reply.filter(v => v._id != comment._id) : comments.value = comments.value.filter(v => v._id != comment._id));
 
     if (descriptionContainer.value?.clientHeight < descriptionContainer.value?.scrollHeight) {
