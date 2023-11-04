@@ -36,7 +36,7 @@
                     Posts
                 </p>
                 <p>
-                    {{ friends.length }} <br>
+                    {{ userData.friends }} <br>
                     Friends
                 </p>
             </div>
@@ -95,7 +95,7 @@
                         </p>
                     </button>
                 </div>
-                <button class="disabled:cursor-not-allowed flex justify-center items-center gap-2 px-4 py-2 bg-blue/50 hover:bg-blue/75 transition-all duration-300 text-white mx-auto rounded-md dark:bg-blue-500 dark:hover:bg-blue-600" v-if="user.authenticated && user._id != userData._id && userData.isFriend?.status == 1" @click="handleDeleteFriend">
+                <button class="disabled:cursor-not-allowed flex justify-center items-center gap-2 px-4 py-2 transition-all duration-300 text-white mx-auto rounded-md bg-blue-500 hover:bg-blue-600" v-if="user.authenticated && user._id != userData._id && userData.isFriend?.status == 1" @click="handleDeleteFriend">
                     <p class="flex justify-center items-center gap-2">
                         <i v-if="pendingDelFriend" class="bx bx-loader-alt bx-spin"></i>
                         <i v-else class="bx bx-user-check text-2xl"></i>Friend
@@ -104,18 +104,24 @@
             </div>
         </div>
         <div class="dark:text-white dark:bg-dark w-full mt-4 rounded-md lg:w-1/2 grid grid-cols-1 grid-flow-row gap-2 bg-white">
-            <div class="w-full md:w-2/3 mx-auto rounded-md shadow-sm p-2 dark:text-white dark:bg-dark-primary bg-white" v-if="friends.length">
-                <h1 class="text-xl ml-4 font-semibold">Friends</h1>
-                <div class="grid grid-cols-3 grid-flow-row gap-4">
-                    <NuxtLink :to="{name: 'users-id', params: {id: friend.user._id}}" v-for="friend in friends" :key="friend._id">
+            <div class="w-full mx-auto rounded-md shadow-sm p-4 dark:text-white dark:bg-dark-primary bg-white">
+                <div class="flex p-2 justify-between">
+                    <h1 class="text-xl font-semibold">Friends</h1>
+                    <button class="text-lg font-semibold" v-if="friends.length" @click="showUserFriends = true">See All Friends</button>
+                </div>
+                <div class="grid grid-cols-3 grid-flow-row gap-4"  v-if="friends.length">
+                    <NuxtLink :to="{name: 'users-id', params: {id: friend.user._id}}" v-for="friend in friends.slice(0,9)" :key="friend._id">
                         <img :src="friend.user.avatar?.url" alt="" class="rounded-md w-full aspect-square object-center object-cover">
                         <p>{{friend.user.name}}</p>
                     </NuxtLink>
                 </div>
+                <div v-else class="text-center">
+                    <h1>This user doesn't have friends, be the first one!</h1>
+                </div>
             </div>
             <div class="grid grid-cols-1 grid-flow-row gap-2 dark:bg-dark-primary">
                 <div class="rounded-md shadow-sm p-4 flex gap-4 dark:bg-dark-primary mt-2" v-if="user.authenticated && user._id == userData._id">
-                    <img :src="user.avatar?.url" alt="" class="rounded-full w-12 h-12 object-cover">
+                    <img :src="user.avatar?.url" alt="" class="rounded-full w-12 h-12 object-cover aspect-square">
                     <button class="dark:text-white dark:bg-dark-secondary rounded-full w-full text-left bg-black/10 px-4 font-light outline-none" @click="createPostStatus = true">
                         Create post...
                     </button>
@@ -141,6 +147,7 @@
         <CreatePost v-if="createPostStatus" @new-post="post => posts.unshift(post)" @close-create-post-status="createPostStatus = false" @posting-status="status => postingStatus = status" />
         <EditPost v-if="editPostStatus" @close-edit-post="editPostStatus = null" />
         <SelectedPost v-if="showSelectedPost" :id="showSelectedPost" @close-selected-post="showSelectedPost = null" />
+        <ShowFriends v-if="showUserFriends" :id="id" :name="userData.name" @show-user-friends="showUserFriends = false" />
     </div>
 </template>
 <script setup>
@@ -151,6 +158,7 @@ const toast = useToast();
 const createPostStatus = ref(false);
 const editPostStatus = ref(null);
 const showSelectedPost = ref(null);
+const showUserFriends = ref(false);
 const postingStatus = ref(false);
 const avatar = ref(null);
 const banner = ref(null);
@@ -309,5 +317,4 @@ useHead({
 .upload-enter-to {
     @apply opacity-100 translate-y-0
 }
-
 </style>
