@@ -29,9 +29,8 @@
                     </div>
                 </div>
             </div>
-            <label for="imagesInput" class="w-max m-4 rounded-sm dark:bg-dark-secondary dark:hover:bg-white/30 bg-black/50 hover:bg-black/75 transition-all duration-150 py-1 px-2 text-white cursor-pointer">
-                <i class='bx bxs-file-image'></i>
-                Add Images Up To 4 Images
+            <label for="imagesInput" class="flex justify-center items-center text-2xl w-max m-4 rounded-sm dark:bg-dark-secondary dark:hover:bg-white/30 bg-black/50 hover:bg-black/75 transition-all duration-150 py-1 px-2 text-white cursor-pointer">
+                <i class='bx bxs-camera'></i>
             </label>
             <input type="file" multiple name="images[]" accept=".jpg,.jpeg,.png,.webp" id="imagesInput" class="hidden" @input="handleInputFile">
             <button class="dark:disabled:bg-transparent disabled:cursor-not-allowed mx-auto w-1/2 py-2 text-white text-xl font-semibold dark:bg-dark-secondary dark:hover:bg-white/30 bg-black/50 hover:bg-black/75 transition-all duration-150 rounded-sm" :disabled="pending || !(description || images.length)" @click="handlePost">
@@ -58,7 +57,7 @@ const handleInputFile = ({target}) => {
     if (files.length) {
         if (files.length > 4) {
             toast.value.push("Cannot select images more than 4!");
-            files.splice(4, files.length - 1);
+            files.splice(4);
         }
 
         const allowed = ["png", "jpg", "jpeg", "webp"]
@@ -76,7 +75,7 @@ const handleInputFile = ({target}) => {
 }
 
 const handlePost = async () => {
-    if (pending.value || !(description || images.length)) return;
+    if (pending.value || !(description.value || images.value.length)) return;
     pending.value = true;
     let formData = new FormData();
     formData.append("description", description.value);

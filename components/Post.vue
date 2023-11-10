@@ -14,11 +14,17 @@
                 <button class="text-2xl p-2 rounded-full flex justify-center items-center" :class="{'bg-black/10 dark:bg-white/10': showPostMenu}" @click="showPostMenu = !showPostMenu">
                     <i class='bx bx-dots-horizontal-rounded'></i>
                 </button>
-                <div v-if="showPostMenu" class="absolute dark:bg-dark-primary dark:text-white top-full right-0 flex flex-col items-start w-48 bg-white z-10 rounded-lg shadow-md" @click="showPostMenu = false">
+                <div v-if="showPostMenu" class="absolute dark:bg-dark-primary dark:text-white top-full right-0 flex flex-col items-start w-48 bg-white z-10 rounded-sm shadow-md" @click="showPostMenu = false">
                     <button class="dark:hover:dark-hover p-1 text-left font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" v-if="user._id == post.user._id" @click="$emit('editPost', post._id)">
                         <i class='bx bx-pencil text-2xl'></i>
                         <p class="">
                             Edit Post
+                        </p>
+                    </button>
+                    <button class="dark:hover:dark-hover p-1 text-left font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" @click="handleBookmarkPost">
+                        <i class="bx bx-bookmark text-2xl"></i> 
+                        <p>
+                            Bookmark
                         </p>
                     </button>
                     <button class="dark:hover:dark-hover p-1 text-left text-red-500 font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" @click="confirmDeletePost = true" v-if="user._id == post.user._id">
@@ -39,11 +45,11 @@
             </button>
         </div>
         <div class="grid gap-1" :class="{'grid-cols-1 grid-rows-1': post.images.length == 1, 'grid-cols-2 grid-rows-1': post.images.length == 2, 'grid-cols-2 grid-rows-2': post.images.length == 3, 'grid-cols-2 grid-rows-2': post.images.length == 4}">
-            <img v-for="(images, i) in post.images" :key="images.discordId" :src="images.images" alt="attachments" class="w-full overflow-hidden cursor-pointer" :class="{'aspect-square object-cover object-top': post.images.length > 1, 'col-span-2 h-64': i == 0 && post.images.length == 3}" loading="lazy" @click="$emit('selectPost', post._id)">
+            <img v-for="(images, i) in post.images" :key="images.discordId" :src="images.images" alt="attachments" class="w-full overflow-hidden cursor-pointer object-cover h-96 object-top" :class="{'aspect-square': post.images.length > 1, 'col-span-2 object-center': i == 0 && post.images.length == 3}" loading="lazy" @click="$emit('selectPost', post._id)">
         </div>
         <div class="px-2">
             <i class="bx bx-like"></i> {{ post.likes.length }}
-            <i class="bx bx-chat"></i> {{ comments.length }}
+            <i class="bx bx-chat"></i> {{ post.totalComments }}
         </div>
         <div class="flex flex-row justify-between p-2 border-y dark:border-white/10 border-black/10">
             <button class="action-post" @click="handleLikePost">
@@ -77,20 +83,22 @@
 </template>
 <script setup>
 import moment from "moment";
-const emit = defineEmits(["selectPost", "deletePost", "likePost"]);
+const emit = defineEmits(["selectPost", "deletePost", "likePost", "bookmarkPost"]);
 const { post } = defineProps(["post"]);
 const toast = useToast();
 const user = userStore();
 const socket = useSocket();
 const rooms = roomsStore();
+const showPostMenu = ref(false);
 const divComment = ref(undefined);
 const comment = ref('');
 const confirmDeletePost = ref(false);
 
-const { data: comments, error: errorComments, pending: pendingComments, refresh: refreshComments } = await getCommentsPost(post._id);
+// const { data: comments, error: errorComments, pending: pendingComments, refresh: refreshComments } = await getCommentsPost(post._id);
 const { data: like, error: errorLike, pending: pendingLike, execute: executeLike } = await likePost(post._id);
+const { data: bookmark, error: errorBookmark, pending: pendingBookmark, execute: executeBookmark } = await bookmarkPost(post._id);
 pendingLike.value = false;
-
+pendingBookmark.value = false;
 
 const handleLikePost = async () => {
     await executeLike();
@@ -99,6 +107,15 @@ const handleLikePost = async () => {
     } else {
         emit("likePost", like.value);
     }
+}
+
+const handleBookmarkPost = async () => {
+    await executeBookmark();
+    if (errorBookmark.value) {
+        toast.value.push("Cannot bookmark post");
+        return;
+    }
+    emit("bookmarkPost", bookmark.value)
 }
 
 const handleDeletePost = async () => {
@@ -113,7 +130,6 @@ const handleDeletePost = async () => {
 
 const isOverflowing = ref(false);
 const showLess = ref(false);
-const showPostMenu = ref(false);
 const descriptionContainer = ref(null);
 
 const handleOverflowing = () => {

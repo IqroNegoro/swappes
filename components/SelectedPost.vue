@@ -56,7 +56,7 @@
                     </div>
                     <div class="px-2">
                         <i class="bx bx-like"></i> {{ post.likes.length }}
-                        <i class="bx bx-chat"></i> {{ comments.length }}
+                        <i class="bx bx-chat"></i> {{ post.totalComments }}
                     </div>
                     <div class="flex flex-row justify-between p-2 dark:border-white/10 border-y border-black/10">
                         <button class="action-post" @click="handleLikePost">

@@ -24,17 +24,18 @@
             <h1>It looks like you have been see all posts!</h1>
             <button @click="refresh" class="text-white bg-black/50 hover:bg-black/75 dark:bg-dark-secondary px-2 py-1 transition-all duration-300">Refresh</button>
         </div>
-        <Post v-else v-for="post in posts" :key="post._id" :post="post" @delete-post="id => posts = posts.filter(v => v._id != id)" @like-post="likes => posts.find(v => v._id == likes._id).likes = likes.likes" @select-post="id => showSelectedPost = id" @edit-post="id => editPostStatus = id" />
+        <Post v-else v-for="post in posts" :key="post._id" :post="post" @delete-post="id => posts = posts.filter(v => v._id != id)" @like-post="likes => posts.find(v => v._id == likes._id).likes = likes.likes" @select-post="id => showSelectedPost = id" @edit-post="id => editPost = id" @bookmark-post="bookmark => posts.find(v => v._id == bookmark.post).bookmark = bookmark" />
         <CreatePost v-if="createPostStatus" @new-post="post => posts.unshift(post)" @close-create-post-status="createPostStatus = false" @posting-status="status => postingStatus = status" />
-        <EditPost v-if="editPostStatus" @close-edit-post="editPostStatus = null" />
+        <EditPost v-if="editPost" :id="editPost" @updated-post="post => posts.findIndex(v => v._id == post._id) >= 0 ? posts.splice(posts.findIndex(v => v._id == post._id), 1, post) : ''" @close-edit-post="editPost = null" />
         <SelectedPost v-if="showSelectedPost" :id="showSelectedPost" @close-selected-post="showSelectedPost = null" />
     </div>
 </template>
 <script setup>
 const user = userStore();
 const { data: posts, pending, error, refresh } = await getPosts();
+console.log(posts.value)
 const createPostStatus = ref(false);
-const editPostStatus = ref(null);
+const editPost = ref(null);
 const showSelectedPost = ref(null);
 const postingStatus = ref(false);
 

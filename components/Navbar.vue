@@ -42,20 +42,29 @@
                 </div>
             </button>
             <button class="relative" @click="showUserMenu = !showUserMenu" id="userMenu">
-                <img v-if="user.avatar.url" :src="user.avatar.url" alt="" class="rounded-full w-12 h-12 object-cover">
+                <img v-if="user.avatar.url" :src="user.avatar?.url" :alt="user.name" class="rounded-full w-12 h-12 object-cover">
                 <div v-else class="rounded-full w-12 h-12 bg-black/10"></div>
-                <div class="flex flex-col items-start absolute w-max p-2 right-0 dark:bg-dark-primary dark:text-white bg-white shadow-md rounded-md divide-y divide-black/10" v-if="user.authenticated && showUserMenu">
-                    <NuxtLink :to="user._id ? {name: 'users-id', params: {id: user._id}} : {name: 'login'}" class="dark:text-inherit text-black py-2">
-                        <i class='bx bx-user-circle'></i>
-                        My Profiles
+                <div class="flex flex-col items-start absolute w-96 gap-2 p-4 right-0 dark:bg-dark-primary dark:text-white bg-white shadow-md rounded-md" v-if="user.authenticated && showUserMenu">
+                    <NuxtLink :to="{name: 'users-id', params: {id: user._id}}" class="group p-4 hover:bg-dark-secondary transition-all duration-300 shadow-lg rounded-lg w-full flex justify-between items-center">
+                        <div class="flex justify-center items-center gap-4">
+                            <img :src="user.avatar?.url" :alt="user.name" class="rounded-full w-12 h-12 object-cover">
+                            <p class="font-semibold"> {{ user.name }} </p>
+                        </div>
+                        <i class="bx bx-chevron-right text-3xl opacity-0 group-hover:opacity-100 group-hover:translate-x-4 duration-150"></i>
                     </NuxtLink>
-                    <!-- <NuxtLink to="" class="dark:text-inherit text-black py-2">
-                        <i class='bx bx-cog'></i>
-                        Settings
-                    </NuxtLink> -->
-                    <button class="dark:text-inherit text-black pt-2" @click="logout">
-                        <i class='bx bx-log-out'></i>
-                        Log Out
+                    <button class="group hover:bg-dark-secondary dark:text-inherit w-full text-black p-2 rounded-md flex justify-between items-center" @click="logout">
+                        <div class="flex justify-center items-center flex-row gap-4">
+                            <i class="bx bxs-bookmark text-2xl"></i>
+                            Bookmarks
+                        </div>
+                        <i class="bx bx-chevron-right text-3xl opacity-0 group-hover:opacity-100 group-hover:translate-x-2 duration-150"></i>
+                    </button>
+                    <button class="group hover:bg-dark-secondary dark:text-inherit w-full text-black p-2 rounded-md flex justify-between items-center" @click="logout">
+                        <div class="flex justify-center items-center flex-row gap-4">
+                            <i class='bx bx-log-out text-2xl'></i>
+                            Log Out
+                        </div>
+                        <i class="bx bx-chevron-right text-3xl opacity-0 group-hover:opacity-100 group-hover:translate-x-2 duration-150"></i>
                     </button>
                 </div>
             </button>

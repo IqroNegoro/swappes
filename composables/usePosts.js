@@ -17,6 +17,13 @@ export const createPost = async post => await useApi("posts", {
     key: "create-post",
 })
 
+export const updatePost = async (id, body) => await useApi(`posts/${id}`, {
+    method: "PUT",
+    body,
+    transform: res => res.data,
+    key: `update-${id}-post`
+})
+
 export const deletePost = async id => await useApi(`posts/${id}`, {
     method: "DELETE",
     key: "delete-post"
@@ -48,4 +55,14 @@ export const deleteComment = async (id, commentId) => await useApi(`posts/${id}/
     key: `delete-comment-${commentId}`,
     transform: res => res.data,
     immediate: false
+})
+
+export const bookmarkPost = async id => await useApi(`users/bookmarks`, {
+    method: "POST",
+    body: {
+        id
+    },
+    transform: res => res.data,
+    immediate: false,
+    key: "bookmark-post"
 })
