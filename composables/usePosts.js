@@ -76,6 +76,8 @@ export const deleteBookmarkPost = async id => await useApi(`/bookmarks/${id}`, {
 })
 
 export const copyLink = id => {
+    let toast = useToast();
     let text = `${window.location.href}posts/${id}`
     navigator.clipboard.writeText(text);
+    toast.value.push("Link post copied")
 }

@@ -107,9 +107,7 @@ const handleUpdate = async () => {
     }
 
     const { data, error } = await updatePost(post.value._id, formData);
-    console.log(data.value)
     if (error.value) {
-        console.log(error.value.data);
         toast.value.push("Something Went Wrong");
     } else {
         toast.value.push("Your post has been updated");

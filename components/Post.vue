@@ -95,9 +95,8 @@
 </template>
 <script setup>
 import moment from "moment";
-const emit = defineEmits(["selectPost", "deletePost", "likePost", "bookmarkPost", "deleteBookmarkPostost"]);
+const emit = defineEmits(["selectPost", "deletePost", "likePost", "bookmarkPost", "deleteBookmarkPost"]);
 const { post } = defineProps(["post"]);
-console.log(post)
 const toast = useToast();
 const user = userStore();
 const socket = useSocket();
@@ -114,6 +113,7 @@ const { data: delBookmark, error: errorDelBookmark, pending: pendingDelBookmark,
 pendingDelPost.value = false;
 pendingLike.value = false;
 pendingBookmark.value = false;
+pendingDelBookmark.value = false;
 
 const handleLikePost = async () => {
     await executeLike();

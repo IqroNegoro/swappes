@@ -35,11 +35,31 @@
                             <button class="text-2xl pt-1 px-2 rounded-full" :class="{'bg-black/10': showPostMenu}" @click="showPostMenu = !showPostMenu">
                                 <i class='bx bx-dots-horizontal-rounded'></i>
                             </button>
-                            <div v-if="showPostMenu" class="absolute dark:bg-dark-primary dark:text-white top-full right-0 flex flex-col items-start w-48 bg-white z-10 rounded-lg shadow-md" @click="showPostMenu = false">
+                            <div v-if="showPostMenu" class="absolute dark:bg-dark-primary dark:text-white top-full right-0 flex flex-col items-start w-48 bg-white z-10 rounded-lg shadow-md" @click.self="showPostMenu = false">
                                 <button class="p-1 text-left font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" v-if="user._id == post.user._id" @click="$emit('editPost', post._id)">
                                     <i class='bx bx-pencil text-2xl'></i>
                                     <p class="">
                                         Edit Post
+                                    </p>
+                                </button>
+                                <button class="dark:hover:dark-hover p-1 text-left font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" @click="handleBookmarkPost" v-if="!post.bookmark">
+                                    <i v-if="pendingBookmark" class="bx bx-loading-alt bx-spin text-2xl"></i>
+                                    <i v-else class="bx bx-bookmark text-2xl"></i> 
+                                    <p>
+                                        Bookmark
+                                    </p>
+                                </button>
+                                <button v-else class="dark:hover:dark-hover p-1 text-left font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" @click="handleDeleteBookmarkPost">
+                                    <i v-if="pendingDelBookmark" class="bx bx-loading-alt bx-spin text-2xl"></i>
+                                    <i v-else class="bx bxs-bookmark text-2xl"></i> 
+                                    <p>
+                                        Bookmark
+                                    </p>
+                                </button>
+                                <button class="dark:hover:dark-hover p-1 text-left font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" @click="copyLink(post._id)">
+                                    <i class="bx bx-link text-2xl"></i> 
+                                    <p>
+                                        Copy Link
                                     </p>
                                 </button>
                                 <button class="p-1 text-left text-red-500 font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" @click="confirmDeletePost = true" v-if="user._id == post.user._id">
@@ -138,7 +158,7 @@
 </template>
 <script setup>
 import moment from "moment";
-const emit = defineEmits(["deletePost", "likePost", "closeSelectedPost", "editPost"]);
+const emit = defineEmits(["deletePost", "likePost", "closeSelectedPost", "editPost", "bookmarkPost", "deleteBookmarkPost"]);
 const { id } = defineProps(["id"]);
 const toast = useToast();
 const user = userStore();
@@ -156,8 +176,12 @@ const { data: post, error: errorPost, pending: pendingPost, refresh: refreshPost
 const { data: delPost, error: errorDelPost, pending: pendingDelPost, execute: executeDelPost } = await deletePost(id);
 const { data: comments, error: errorComments, pending: pendingComments, refresh: refreshComments } = await getCommentsPost(id);
 const { data: like, error: errorLike, pending: pendingLike, execute: executeLike } = await likePost(id);
+const { data: bookmark, error: errorBookmark, pending: pendingBookmark, execute: executeBookmark } = await bookmarkPost(id);
+const { data: delBookmark, error: errorDelBookmark, pending: pendingDelBookmark, execute: executeDelBookmark } = await deleteBookmarkPost(id);
 pendingDelPost.value = false;
 pendingLike.value = false;
+pendingBookmark.value = false;
+pendingDelBookmark.value = false;
 
 const pendingSendComment = ref(false);
 
@@ -184,13 +208,32 @@ const handleLikePost = async () => {
     }
 }
 
+const handleBookmarkPost = async () => {
+    await executeBookmark();
+    if (errorBookmark.value) {
+        toast.value.push("Cannot bookmark post");
+        return;
+    }
+    post.value.bookmark = bookmark.value;
+    emit("bookmarkPost", bookmark.value)
+}
+
+const handleDeleteBookmarkPost = async () => {
+    await executeDelBookmark();
+    if (errorDelBookmark.value) {
+        toast.value.push("Cannot bookmark post");
+        return;
+    }
+    post.value.bookmark = null;
+    emit("deleteBookmarkPost", delBookmark.value)
+}
+
 const handleDeletePost = async () => {
     await executeDelPost();
     if (errorDelPost.value) {
         toast.value.push("Something Wrong");
     } else {
         toast.value.push("Success Delete Post");
-        console.log(delPost.value._id)
         emit("deletePost", delPost.value._id)
     }
 }
@@ -204,7 +247,6 @@ const handlePostComment = async () => {
     const { data, error } = await commentPost(post.value._id, fd);
     pendingSendComment.value = false;
     if (error.value) {
-        console.log(error.value.data)
         error.value.data.errors.forEach(v => {
             toast.value.push(v)
         })

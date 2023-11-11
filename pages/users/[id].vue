@@ -147,6 +147,7 @@
         <CreatePost v-if="createPostStatus" @new-post="post => posts.unshift(post)" @close-create-post-status="createPostStatus = false" />
         <EditPost v-if="editPost" :id="editPost" @updated-post="post => posts.findIndex(v => v._id == post._id) >= 0 ? posts.splice(posts.findIndex(v => v._id == post._id), 1, post) : ''" @close-edit-post="editPost = null" />
         <SelectedPost v-if="showSelectedPost" :id="showSelectedPost" @close-selected-post="showSelectedPost = null" @edit-post="id => {editPost = id; showSelectedPost = null}" />
+        <ShowFriends v-if="showUserFriends" :id="id" :name="userData.name" @close-user-friends="showUserFriends = false" />
     </div>
 </template>
 <script setup>

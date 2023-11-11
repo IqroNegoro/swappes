@@ -1,9 +1,9 @@
 <template>
-    <div class="flex flex-col lg:flex-row overflow-hidden dark:bg-dark md:h-screen overflow-y-auto">
+    <div class="flex flex-col lg:flex-row overflow-hidden dark:bg-dark h-screen overflow-y-auto">
         <div class="w-full flex justify-center items-center relative" v-if="post.images.length">
-            <button @click="$router.back()" class="absolute top-0 left-0 m-2 px-1 flex justify-center items-center bg-dark-primary/50 hover:bg-dark-primary duration-150 transition-all hover:scale-105 rounded-full">
+            <NuxtLink :to="{name: 'index'}" class="absolute top-0 left-0 m-2 px-1 flex justify-center items-center bg-dark-primary/50 hover:bg-dark-primary duration-150 transition-all hover:scale-105 rounded-full">
                 <i class="bx bx-x dark:text-white text-2xl"></i>
-            </button>
+            </NuxtLink>
             <button class="absolute top-1/2 -translate-y-1/2 left-0 p-2 ml-1 flex justify-center items-center bg-dark-primary/50 hover:bg-dark-primary duration-150 transition-all hover:scale-105" v-if="post.images.length > 1" @click="indexImage == 0 ? indexImage = post.images.length - 1 : indexImage--">
                 <i class='bx bxs-chevron-left text-xs md:text-3xl dark:text-white'></i>
             </button>
@@ -29,10 +29,22 @@
                             <i class='bx bx-dots-horizontal-rounded'></i>
                         </button>
                         <div v-if="showPostMenu" class="absolute dark:bg-dark-primary dark:dark:text-white top-full right-0 flex flex-col items-start w-48 bg-white z-10 rounded-lg shadow-md" @click="showPostMenu = false">
-                            <button class="p-1 text-left font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" v-if="user._id == post.user._id">
-                                <i class='bx bx-pencil text-2xl'></i>
-                                <p class="">
-                                    Edit Post
+                            <button class="dark:hover:dark-hover p-1 text-left font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" @click="handleBookmarkPost" v-if="!post.bookmark">
+                                <i class="bx bx-bookmark text-2xl"></i> 
+                                <p>
+                                    Bookmark
+                                </p>
+                            </button>
+                            <button v-else class="dark:hover:dark-hover p-1 text-left font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" @click="handleDeleteBookmarkPost">
+                                <i class="bx bxs-bookmark text-2xl"></i> 
+                                <p>
+                                    Bookmark
+                                </p>
+                            </button>
+                            <button class="dark:hover:dark-hover p-1 text-left font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" @click="copyLink(post._id)">
+                                <i class="bx bx-link text-2xl"></i> 
+                                <p>
+                                    Copy Link
                                 </p>
                             </button>
                             <button class="p-1 text-left text-red-500 font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" @click="handleDeletePost" v-if="user._id == post.user._id">
@@ -54,12 +66,12 @@
                 </div>
                 <div class="px-2">
                     <i class="bx bx-like"></i> {{ post.likes.length }}
-                    <i class="bx bx-chat"></i> {{ comments.length }}
+                    <i class="bx bx-chat"></i> {{ post.totalComments }}
                 </div>
                 <div class="flex flex-row justify-between p-2 dark:border-white/10 border-y border-black/10">
                     <button class="action-post" @click="handleLikePost">
                         <i class='bx bx-loader-alt bx-spin' v-if="pendingLike"></i>
-                        <i class='bx bxs-like text-blue-500' v-else-if="post.likes.find(v => v._id == user._id)"></i>
+                        <i class='bx bxs-like text-blue-500' v-else-if="post.likes.find(v => v == user._id)"></i>
                         <i class='bx bx-like' v-else></i>
                         <span>Like</span>
                     </button>
@@ -69,7 +81,7 @@
                     </button>
                 </div>
             </div>
-            <div class="dark:text-white overflow-y-auto overscroll-contain light-scrollbar" :class="{'h-full': !post.images.length}">
+            <div class="dark:text-white overflow-y-auto h-full overscroll-contain light-scrollbar" :class="{'h-full': !post.images.length}">
                 <div v-if="pendingComments" class="flex flex-col justify-center items-center my-16 gap-2">
                     <i class="bx bx-loader-alt bx-spin text-5xl"></i>
                     <p>Load Comments...</p>
@@ -120,14 +132,19 @@ const socket = useSocket();
 
 const { id } = useRoute().params;
 
-const { data: post, pending, error, refresh } = await getPost(id);
+const { data: post, pending: pendingPost, error: errorPost, refresh: refreshPost } = await getPost(id);
 if (!post.value) {
     throw createError({statusCode: 404, statusMessage: "Post Doesnt Exist"});
 };
 const { data: delPost, error: errorDelPost, pending: pendingDelPost, execute: executeDelPost } = await deletePost(id);
 const { data: comments, error: errorComments, pending: pendingComments, refresh: refreshComments } = await getCommentsPost(id);
 const { data: like, error: errorLike, pending: pendingLike, execute: executeLike } = await likePost(id);
+const { data: bookmark, error: errorBookmark, pending: pendingBookmark, execute: executeBookmark } = await bookmarkPost(id);
+const { data: delBookmark, error: errorDelBookmark, pending: pendingDelBookmark, execute: executeDelBookmark } = await deleteBookmarkPost(id);
+pendingDelPost.value = false;
 pendingLike.value = false;
+pendingBookmark.value = false;
+pendingDelBookmark.value = false;
 
 const indexImage = ref(0);
 const postContainer = ref(undefined);
@@ -166,6 +183,23 @@ const handleDeletePost = async () => {
     }
 }
 
+const handleBookmarkPost = async () => {
+    await executeBookmark();
+    if (errorBookmark.value) {
+        toast.value.push("Cannot bookmark post");
+        return;
+    }
+    post.value.bookmark = bookmark.value;
+}
+
+const handleDeleteBookmarkPost = async () => {
+    await executeDelBookmark();
+    if (errorDelBookmark.value) {
+        toast.value.push("Cannot bookmark post");
+        return;
+    }
+    post.value.bookmark = null;
+}
 
 const handleLikePost = async () => {
     await executeLike();

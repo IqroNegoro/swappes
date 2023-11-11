@@ -39,13 +39,13 @@
                         </div>
                         <i class="bx bx-chevron-right text-3xl opacity-0 group-hover:opacity-100 group-hover:translate-x-4 duration-150"></i>
                     </NuxtLink>
-                    <button class="group hover:bg-dark-secondary dark:text-inherit w-full text-black p-2 rounded-md flex justify-between items-center" @click="logout">
+                    <NuxtLink :to="{name: 'bookmarks'}" class="group hover:bg-dark-secondary dark:text-inherit w-full text-black p-2 rounded-md flex justify-between items-center">
                         <div class="flex justify-center items-center flex-row gap-4">
                             <i class="bx bxs-bookmark text-2xl"></i>
                             Bookmarks
                         </div>
                         <i class="bx bx-chevron-right text-3xl opacity-0 group-hover:opacity-100 group-hover:translate-x-2 duration-150"></i>
-                    </button>
+                    </NuxtLink>
                     <button class="group hover:bg-dark-secondary dark:text-inherit w-full text-black p-2 rounded-md flex justify-between items-center" @click="logout">
                         <div class="flex justify-center items-center flex-row gap-4">
                             <i class='bx bx-log-out text-2xl'></i>

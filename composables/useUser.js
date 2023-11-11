@@ -59,3 +59,11 @@ export const deleteFriend = async id => await useApi(`users/${id}/friends`, {
     immediate: false,
     key: `delete-friend-${id}`
 })
+
+export const getBookmarks = async options => await useApi(`bookmarks`, {
+    ...options,
+    transform: res => res.data,
+    default: () => [],
+    lazy: true,
+    key: "get-bookmarks"
+})
