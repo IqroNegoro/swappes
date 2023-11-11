@@ -1,8 +1,18 @@
 <template>
-    <div class="fixed bg-black/50 top-0 left-0 w-full h-full flex justify-center items-center z-20" @click="$emit('closeSelectedPost')">
+    <div class="fixed bg-black/50 top-0 left-0 w-full h-full flex justify-center items-center z-20" @click.self="$emit('closeSelectedPost')">
         <Transition name="fade-up" appear mode="in-out">
-            <div ref="container" class="dark:bg-dark-primary dark:text-white relative md:rounded-md w-full md:w-3/4 lg:w-1/2 h-full md:max-h-[85%] overflow-hidden bg-white flex flex-col" @click.stop>
+            <div ref="container" class="dark:bg-dark-primary dark:text-white relative md:rounded-md w-full md:w-3/4 lg:w-1/2 h-full md:max-h-[85%] overflow-hidden bg-white flex flex-col" :class="{'justify-center items-center': errorPost && !pendingPost}" @click.stop>
                 <SelectedPostSkeleton v-if="pendingPost" />
+                <div v-else-if="errorPost" class="flex justify-center items-center flex-col gap-4">
+                    <button class="flex justify-center items-center absolute top-0 right-0 m-2 text-2xl" @click="$emit('closeSelectedPost')">
+                        <i class="bx bx-x"></i>
+                    </button>
+                    <i class="bx bx-error-circle text-7xl"></i>
+                    <h1>Something Wrong</h1>
+                    <button class="rounded-sm dark:bg-dark-secondary px-3 py-1" @click="refreshPost">
+                        Reload
+                    </button>
+                </div>
                 <template v-else>
                 <div class="relative flex justify-center items-center py-4">
                     <p class="font-semibold">{{post.user.name}} post</p>
@@ -10,7 +20,7 @@
                         <i class="bx bx-x"></i>
                     </button>
                 </div>
-                <div class="flex flex-col w-full h-full overflow-y-scroll overflow-x-hidden overscroll-contain rounded-scrollbar gap-2" ref="postContainer">
+                <div class="flex flex-col w-full h-full overflow-y-scroll overflow-x-hidden overscroll-contain rounded-scrollbar gap-2 light-scrollbar" ref="postContainer">
                     <div class="flex justify-between px-4 pt-2">
                         <div class="flex gap-2">
                             <NuxtLink :to="{name: 'users-id', params: {id: post.user._id}}">
@@ -26,13 +36,13 @@
                                 <i class='bx bx-dots-horizontal-rounded'></i>
                             </button>
                             <div v-if="showPostMenu" class="absolute dark:bg-dark-primary dark:text-white top-full right-0 flex flex-col items-start w-48 bg-white z-10 rounded-lg shadow-md" @click="showPostMenu = false">
-                                <button class="p-1 text-left font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" v-if="user._id == post.user._id">
+                                <button class="p-1 text-left font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" v-if="user._id == post.user._id" @click="$emit('editPost', post._id)">
                                     <i class='bx bx-pencil text-2xl'></i>
                                     <p class="">
                                         Edit Post
                                     </p>
                                 </button>
-                                <button class="p-1 text-left text-red-500 font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" @click="handleDeletePost" v-if="user._id == post.user._id">
+                                <button class="p-1 text-left text-red-500 font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" @click="confirmDeletePost = true" v-if="user._id == post.user._id">
                                     <i class="bx bx-trash text-2xl"></i>
                                     <p class="">
                                         Delete Post
@@ -61,7 +71,7 @@
                     <div class="flex flex-row justify-between p-2 dark:border-white/10 border-y border-black/10">
                         <button class="action-post" @click="handleLikePost">
                             <i class='bx bx-loader-alt bx-spin' v-if="pendingLike"></i>
-                            <i class='bx bxs-like text-blue-500' v-else-if="post.likes.find(v => v._id == user._id)"></i>
+                            <i class='bx bxs-like text-blue-500' v-else-if="post.likes.find(v => v == user._id)"></i>
                             <i class='bx bx-like' v-else></i>
                             <span>Like</span>
                         </button>
@@ -99,7 +109,7 @@
                         </label>
                         <input ref="inputImage" type="file" name="image" accept=".jpg,.jpeg,.png,.webp" id="imagesInput" class="hidden" @input="handleInputFile">
                         <button class="flex justify-center items-center px-1 text-xl" @click="handlePostComment">
-                            <i class="bx bx-send"></i>
+                            <i class="bx" :class="{'bx-send': !comment.trim(), 'bxs-send': comment.trim()}"></i>
                         </button>
                     </div>
                 </div>
@@ -112,11 +122,23 @@
                 </template>
             </div>
         </Transition>
+        <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black/50 z-50 overscroll-none" v-if="confirmDeletePost">
+            <div class="dark:bg-dark-primary dark:text-white rounded-md bg-white p-4 shadow-md w-max">
+                <button class="ml-auto block px-1 rounded-full" @click="confirmDeletePost = false">
+                    <i class="bx bx-x text-xl rounded-full"></i>
+                </button>
+                <p>Are you sure to delete this post?</p>
+                <div class="flex flex-row justify-around gap-2 mt-2">
+                    <button class="dark:hover:bg-dark dark:bg-dark-secondary transition-all duration-150 px-2 py-1 w-full rounded-sm" @click="handleDeletePost">Delete</button>
+                    <button class="dark:hover:bg-dark dark:bg-dark-secondary transition-all duration-150 px-2 py-1 w-full rounded-sm" @click="confirmDeletePost = false">Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <script setup>
 import moment from "moment";
-const emit = defineEmits(["deletePost", "likePost", "closeSelectedPost"]);
+const emit = defineEmits(["deletePost", "likePost", "closeSelectedPost", "editPost"]);
 const { id } = defineProps(["id"]);
 const toast = useToast();
 const user = userStore();
@@ -128,10 +150,13 @@ const divComment = ref(undefined);
 const image = ref(null);
 const postContainer = ref(undefined);
 const comment = ref('');
+const confirmDeletePost = ref(false);
 
 const { data: post, error: errorPost, pending: pendingPost, refresh: refreshPost } = await getPost(id, {lazy: true});
+const { data: delPost, error: errorDelPost, pending: pendingDelPost, execute: executeDelPost } = await deletePost(id);
 const { data: comments, error: errorComments, pending: pendingComments, refresh: refreshComments } = await getCommentsPost(id);
 const { data: like, error: errorLike, pending: pendingLike, execute: executeLike } = await likePost(id);
+pendingDelPost.value = false;
 pendingLike.value = false;
 
 const pendingSendComment = ref(false);
@@ -160,18 +185,18 @@ const handleLikePost = async () => {
 }
 
 const handleDeletePost = async () => {
-    const { data, error } = await deletePost(post.value._id);
-    if (error.value) {
+    await executeDelPost();
+    if (errorDelPost.value) {
         toast.value.push("Something Wrong");
     } else {
         toast.value.push("Success Delete Post");
-        emit("deletePost", post.value._id)
-        emit("closeSelectedPost")
+        console.log(delPost.value._id)
+        emit("deletePost", delPost.value._id)
     }
 }
 
 const handlePostComment = async () => {
-    if (!comment.value) return;
+    if (!comment.value.trim()) return;
     pendingSendComment.value = true;
     let fd = new FormData();
     fd.append("comment", comment.value)
@@ -179,6 +204,7 @@ const handlePostComment = async () => {
     const { data, error } = await commentPost(post.value._id, fd);
     pendingSendComment.value = false;
     if (error.value) {
+        console.log(error.value.data)
         error.value.data.errors.forEach(v => {
             toast.value.push(v)
         })
@@ -211,9 +237,15 @@ const escClick = ({code}) => {
 
 onMounted(() => {
     document.addEventListener("keydown", escClick)
-    socket.value.emit("join-post", post.value._id);
-    socket.value.on("new-comment", comment => comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply.push(comment) : comments.value.push(comment))
-    socket.value.on("delete-comment", comment => comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply = comments.value.find(v => v._id == comment.replyId).reply.filter(v => v._id != comment._id) : comments.value = comments.value.filter(v => v._id != comment._id));
+    socket.value.emit("join-post", post.value?._id);
+    socket.value.on("new-comment", comment => {
+        comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply.push(comment) : comments.value.push(comment)
+        post.value.totalComments++
+    });
+    socket.value.on("delete-comment", comment => {
+        comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply = comments.value.find(v => v._id == comment.replyId).reply.filter(v => v._id != comment._id) : comments.value = comments.value.filter(v => v._id != comment._id)
+        post.value.totalComments--
+    });
 
     if (descriptionContainer.value?.clientHeight < descriptionContainer.value?.scrollHeight) {
         isOverflowing.value = true;

@@ -11,19 +11,6 @@
         <div class="flex flex-row gap-2">
             <button class="relative dark:bg-dark-secondary px-2 rounded-full" @click="showNotificationsMenu = !showNotificationsMenu" id="notificationMenu">
                 <i class="bx bxs-bell text-3xl"></i>
-                <!-- <div v-if="showNotificationsMenu" class="absolute right-0 dark:bg-dark-primary dark:text-white rounded-md w-80 flex flex-col justify-center items-center p-4 gap-2">
-                    <div v-if="pendingNotification">
-                        <i class="bx bx-loader-alt bx-spin text-5xl"></i>
-                    </div>
-                    <div v-else-if="!notifications.length">
-                        <i class="bx bx-bell text-5xl"></i>
-                        <p>There's no notifications</p>
-                    </div>
-                    <div class="light-scrollbar rounded-scrollbar flex flex-col gap-3 px-2 py-2 absolute top-0 right-0 dark:bg-dark-primary dark:text-white bg-white rounded-md w-80 max-h-[80vh] overflow-y-scroll shadow-md overscroll-contain" v-else>
-                        <h1 class="font-black text-2xl text-left">Notifications</h1>
-                        <NotificationList v-for="notification in notifications" :key="notification._id" :notification="notification" />
-                    </div>
-                </div> -->
                 <div v-if="showNotificationsMenu" class="absolute p-3 flex justify-center items-center top-full right-0 dark:bg-dark-primary dark:text-white rounded-md w-80 min-h-fit max-h-96">
                     <i v-if="pendingNotification" class="bx bx-loader-alt bx-spin text-5xl"></i>
                     <div v-else-if="errorNotification" class="flex flex-col gap-3">

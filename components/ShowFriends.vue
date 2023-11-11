@@ -1,12 +1,12 @@
 <template>
-    <div class="fixed top-0 left-0 bg-black/50 w-full h-full z-50" @click.self="$emit('showUserFriends')">
+    <div class="fixed top-0 left-0 bg-black/50 w-full h-full z-50" @click.self="$emit('closeUserFriends')">
         <Transition name="fade-right" appear>
             <div class="w-full flex flex-col md:w-1/2 lg:w-1/3 h-full dark:bg-dark-primary bg-white dark:text-white">
                 <div class="px-4 flex flex-row justify-between items-center">
                     <p class="md:text-xl text-sm">
                         {{ name }} Friend's
                     </p>
-                    <button class="hover:bg-dark-secondary rounded-full py-1 px-2 transition-all duration-150 right-0 m-4 flex justify-center items-center" @click="$emit('showUserFriends')">
+                    <button class="hover:bg-dark-secondary rounded-full py-1 px-2 transition-all duration-150 right-0 m-4 flex justify-center items-center" @click="$emit('closeUserFriends')">
                         <i class="bx bx-x text-xl"></i>
                     </button>
                 </div>
@@ -17,7 +17,7 @@
                     <h1 v-if="!friends.length && !friendLists.length && !pendingFriends"> This user doesnt have friends, be the first! </h1>
                     <div ref="fetchPoint"></div>
                     <template v-if="friends.length">
-                        <FriendListSkeleton v-for="fren in 7" :key="fren" />
+                        <FriendListSkeleton v-for="fren in 5" :key="fren" />
                     </template>
                 </div>
             </div>
@@ -28,24 +28,26 @@
 const { id, name } = defineProps(["id", "name"]);
 const limit = ref(20);
 const skip = ref(0);
-const fetchPoint = ref(undefined);
+const fetchPoint = ref(null);
 const friendLists = ref([]);
 const { data: friends, error: errorFriends, pending: pendingFriends, refresh: refreshFriends } = await getAllUserFriends(id, {
     params: {
         limit,
         skip
     },
-    watch: [skip],
 });
 
 onMounted(() => {
-    useScroll(fetchPoint?.value, () => {
-        if (friends.value.length) {
-            skip.value += 20,
-            friendLists.value = [...friendLists.value, ...friends.value];
-        }
-    })
+    if (fetchPoint.value) {
+        useScroll(fetchPoint.value, () => {
+            if (friends.value.length) {
+                skip.value += 20
+                friendLists.value = [...friendLists.value, ...friends.value]
+            }
+        })
+    }
 })
+
     
 </script>
 <style scoped>

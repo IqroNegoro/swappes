@@ -44,8 +44,6 @@ onUnmounted(() => {
 
 .page-enter-from,
 .page-leave-to {
-    opacity: 0;
-    transform: translateY(1rem);
     filter:blur(4px);
 }
 </style>

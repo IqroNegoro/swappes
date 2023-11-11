@@ -9,6 +9,5 @@ export default (ref, cb) => {
         threshold: 1,
         rootMargin: "0px"
     })
-
     observer.observe(ref)
 }

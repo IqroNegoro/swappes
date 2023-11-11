@@ -1,6 +1,6 @@
 <template>
-    <div class="flex flex-col lg:flex-row overflow-hidden dark:bg-dark md:h-screen">
-        <div class="w-full flex justify-center items-center relative">
+    <div class="flex flex-col lg:flex-row overflow-hidden dark:bg-dark md:h-screen overflow-y-auto">
+        <div class="w-full flex justify-center items-center relative" v-if="post.images.length">
             <button @click="$router.back()" class="absolute top-0 left-0 m-2 px-1 flex justify-center items-center bg-dark-primary/50 hover:bg-dark-primary duration-150 transition-all hover:scale-105 rounded-full">
                 <i class="bx bx-x dark:text-white text-2xl"></i>
             </button>
@@ -12,8 +12,8 @@
                 <i class='bx bxs-chevron-right text-xs md:text-3xl dark:text-white'></i>
             </button>
         </div>
-        <div class="w-full lg:w-[36rem] h-full flex flex-col px-2 dark:bg-dark">
-            <div class="flex flex-col w-full h-full pt-4 dark:text-white overflow-y-scroll overscroll-contain rounded-scrollbar gap-2" ref="postContainer">
+        <div class="w-full h-full flex flex-col px-2 dark:bg-dark" :class="{'lg:w-[36rem]': post.images.length}">
+            <div class="flex flex-col w-full pt-4 dark:text-white rounded-scrollbar gap-2" ref="postContainer">
                 <div class="flex justify-between px-4">
                     <div class="flex gap-2">
                         <NuxtLink :to="{name: 'users-id', params: {id: post.user._id}}">
@@ -68,6 +68,8 @@
                         <span>Share</span>
                     </button>
                 </div>
+            </div>
+            <div class="dark:text-white overflow-y-auto overscroll-contain light-scrollbar" :class="{'h-full': !post.images.length}">
                 <div v-if="pendingComments" class="flex flex-col justify-center items-center my-16 gap-2">
                     <i class="bx bx-loader-alt bx-spin text-5xl"></i>
                     <p>Load Comments...</p>
@@ -81,21 +83,6 @@
                 </div>
                 <TransitionGroup appear tag="div" name="fade-up" class="p-4 flex flex-col gap-4" v-else-if="comments.length">
                     <Comment v-for="comment in comments" :comment="comment" :key="comment._id" @delete-comment="id => comments = comments.filter(v => v._id != id)" />
-                    <!-- <div class="flex flex-row gap-2" v-for="comment in comments" :key="comment._id">
-                        <NuxtLink class="text-sm font-semibold" :to="{name: 'users-id', params: {id: comment.user._id}}">
-                            <img :src="comment.user.avatar?.url" class="w-10 h-10 object-cover rounded-full">
-                        </NuxtLink>
-                        <div class="flex flex-col gap-1">
-                            <div class="dark:bg-dark-secondary rounded-md bg-black/10 px-2 py-1">
-                                <NuxtLink class="text-sm font-semibold" :to="{name: 'users-id', params: {id: comment.user._id}}">{{comment.user.name}}</NuxtLink>
-                                <p class="text-sm text-justify" v-html="comment.comment"></p>
-                            </div>
-                            <div class="flex gap-4 px-2">
-                                <button class="text-xs">Reply</button>
-                                <button class="text-xs" v-if="comment.user._id == user._id" @click="handleDeleteComment">Delete</button>
-                            </div>
-                        </div>
-                    </div> -->
                 </TransitionGroup>
                 <div v-else class="flex flex-col justify-center items-center my-16 gap-2">
                     <i class='bx bx-chat text-5xl'></i>
@@ -134,6 +121,10 @@ const socket = useSocket();
 const { id } = useRoute().params;
 
 const { data: post, pending, error, refresh } = await getPost(id);
+if (!post.value) {
+    throw createError({statusCode: 404, statusMessage: "Post Doesnt Exist"});
+};
+const { data: delPost, error: errorDelPost, pending: pendingDelPost, execute: executeDelPost } = await deletePost(id);
 const { data: comments, error: errorComments, pending: pendingComments, refresh: refreshComments } = await getCommentsPost(id);
 const { data: like, error: errorLike, pending: pendingLike, execute: executeLike } = await likePost(id);
 pendingLike.value = false;
@@ -164,6 +155,18 @@ const handleInputFile = ({target}) => {
     image.value = target.files[0];
 }
 
+const handleDeletePost = async () => {
+    await executeDelPost();
+    if (errorDelPost.value) {
+        toast.value.push("Something Wrong");
+    } else {
+        toast.value.push("Success Delete Post");
+        emit("deletePost", delPost.value.post._id)
+        emit("closeSelectedPost")
+    }
+}
+
+
 const handleLikePost = async () => {
     await executeLike();
     if (errorLike.value) {
@@ -188,6 +191,7 @@ const handlePostComment = async () => {
     } else {
         if (!socket.value.connected) {
             comments.value.push(data.value)
+            post.value.totalComments++
         }
         divComment.value.innerHTML = "";
         comment.value = "";
@@ -225,8 +229,16 @@ onMounted(() => {
     if (!rooms.has(id)) {
         socket.value.emit("join-post", id);
     }
-    socket.value.on("new-comment", comment => comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply.push(comment) : comments.value.push(comment));
-    socket.value.on("delete-comment", comment => comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply = comments.value.find(v => v._id == comment.replyId).reply.filter(v => v._id != comment._id) : comments.value = comments.value.filter(v => v._id != comment._id));
+
+    socket.value.on("new-comment", comment => {
+        comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply.push(comment) : comments.value.push(comment)
+        post.value.totalComments++
+    });
+
+    socket.value.on("delete-comment", comment => {
+        comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply = comments.value.find(v => v._id == comment.replyId).reply.filter(v => v._id != comment._id) : comments.value = comments.value.filter(v => v._id != comment._id)
+        post.value.totalComments--
+    });
 
     if (descriptionContainer.value.clientHeight < descriptionContainer.value.scrollHeight) {
         isOverflowing.value = true;

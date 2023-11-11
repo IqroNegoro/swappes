@@ -4,10 +4,9 @@ export const getPosts = async () => await useApi("posts", {
     key: "get-posts",
 })
 
-export const getPost = async (id, options = {}) => await useApi(`posts/${id}`, {
+export const getPost = async (id, options) => await useApi(`posts/${id}`, {
     ...options,
     transform: res => res.data,
-    default: () => [],
     key: `get-post-${id}`
 })
 
@@ -26,7 +25,9 @@ export const updatePost = async (id, body) => await useApi(`posts/${id}`, {
 
 export const deletePost = async id => await useApi(`posts/${id}`, {
     method: "DELETE",
-    key: "delete-post"
+    key: "delete-post",
+    transform: res => res.data,
+    immediate: false
 })
 
 export const getCommentsPost = async id => await useApi(`posts/${id}/comments`, {
@@ -57,7 +58,7 @@ export const deleteComment = async (id, commentId) => await useApi(`posts/${id}/
     immediate: false
 })
 
-export const bookmarkPost = async id => await useApi(`users/bookmarks`, {
+export const bookmarkPost = async id => await useApi(`/bookmarks`, {
     method: "POST",
     body: {
         id
@@ -66,3 +67,15 @@ export const bookmarkPost = async id => await useApi(`users/bookmarks`, {
     immediate: false,
     key: "bookmark-post"
 })
+
+export const deleteBookmarkPost = async id => await useApi(`/bookmarks/${id}`, {
+    method: "DELETE",
+    transform: res => res.data,
+    immediate: false,
+    key: "bookmark-post"
+})
+
+export const copyLink = id => {
+    let text = `${window.location.href}posts/${id}`
+    navigator.clipboard.writeText(text);
+}
