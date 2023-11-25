@@ -71,7 +71,7 @@
                 <div class="flex flex-row justify-between p-2 dark:border-white/10 border-y border-black/10">
                     <button class="action-post" @click="handleLikePost">
                         <i class='bx bx-loader-alt bx-spin' v-if="pendingLike"></i>
-                        <i class='bx bxs-like text-blue-500' v-else-if="post.likes.find(v => v == user._id)"></i>
+                        <i class='bx bxs-like text-blue-500' v-else-if="post.likes.find(v => v._id == user._id)"></i>
                         <i class='bx bx-like' v-else></i>
                         <span>Like</span>
                     </button>
@@ -207,6 +207,7 @@ const handleLikePost = async () => {
         toast.value.push("Something went wrong when liking post");
     } else {
         post.value.likes = like.value.likes
+        console.log(post.value.likes, like.value.likes)
     }
 }
 

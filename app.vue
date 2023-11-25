@@ -1,6 +1,7 @@
 <template>
     <NuxtLayout>
         <NuxtPage />
+        <NuxtLoadingIndicator />
         <Notification v-if="notification._id" />
         <Toast />
     </NuxtLayout>

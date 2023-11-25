@@ -5,10 +5,10 @@
                 <img v-for="(images, i) in bookmark.post.images" :key="images.discordId" :src="images.images" alt="attachments" class="w-full h-full overflow-hidden cursor-pointer object-cover object-top" :class="{'aspect-square max-h-96': bookmark.post.images.length > 1, 'col-span-2 object-center': i == 0 && bookmark.post.images.length == 3}" loading="lazy">
             </div>
             <div v-else class="w-48 h-24 rounded-sm bg-dark-secondary"></div>
-                <div class="flex flex-col justify-between gap-3 h-full">
-                    <div class="flex flex-col gap-2">
-                        <h1 class="font-semibold truncate">
-                        {{ bookmark.post.description }}
+            <div class="flex flex-col justify-between gap-3 h-full">
+                <div class="flex flex-col gap-2">
+                    <h1 class="font-semibold truncate">
+                    {{ bookmark.post.description }}
                     </h1>
                     <span class="text-sm flex items-center flex-row gap-2">
                         <i class="bx bx-time text-xl"></i>

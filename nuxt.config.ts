@@ -28,7 +28,4 @@ export default defineNuxtConfig({
   tailwindcss: {
     cssPath: '~/assets/css/tailwind.css'
   },
-  runtimeConfig: {
-    apiURL: "https://api.swappes.my.id/"
-  }
 })

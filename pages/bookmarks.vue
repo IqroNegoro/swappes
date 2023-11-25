@@ -1,10 +1,10 @@
 <template>
-    <div class="mt-2 w-full min-h-screen flex justify-start items-start gap-8 p-4 flex-col dark:bg-dark-primary">
+    <div class="mt-2 w-full min-h-screen flex gap-8 p-4 flex-col dark:bg-dark-primary">
         <h1 class="dark:text-white gap-4 text-3xl flex-row">
             <i class="bx bx-bookmarks"></i>
             Bookmarks
         </h1>
-        <div class="dark:text-white w-full flex flex-col justify-center items-center gap-2">
+        <div class="dark:text-white w-full flex flex-col gap-2">
             <div v-if="errorBookmarks" class="flex justify-center items-center flex-col gap-4">
                 <i class="bx bx-error text-5xl"></i>
                 <h1 class="text-3xl">Something Wrong</h1>
@@ -12,13 +12,11 @@
                     Try Again
                 </button>
             </div>
-            <template v-if="bookmarkLists.length">
-                <BookmarkList v-for="bookmark in bookmarkLists" :key="bookmark._id" :bookmark="bookmark" />
-            </template>
-            <p v-else>It's seems that you not bookmark anything, bookmarks now for see later~</p>
+            <div v-else-if="!bookmarkLists.length && !bookmarks.length">It's seems that you not bookmark anything, bookmarks now for see later~</div>
+            <BookmarkList v-else v-for="bookmark in bookmarkLists" :key="bookmark._id" :bookmark="bookmark" />
             <div ref="fetchPoint"></div>
-            <template v-if="pendingBookmarks || bookmarks.length">
-                <BookmarkListSkeleton v-for="bookmark in 5" :key="bookmark" />
+            <template v-if="bookmarks.length">
+                <BookmarkListSkeleton v-for="bookmark in 6" :key="bookmark" />
             </template>
         </div>
     </div>
@@ -36,7 +34,9 @@ const { data: bookmarks, error: errorBookmarks, pending: pendingBookmarks, refre
     }
 });
 
+
 watch(bookmarks, bookmarks => {
+    console.log('watch', bookmarks)
     bookmarkLists.value = [...bookmarkLists.value, ...bookmarks]
 })
 
