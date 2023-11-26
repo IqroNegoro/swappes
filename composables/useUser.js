@@ -1,4 +1,5 @@
-export const getUserById = async id => await useApi(`users/${id}`, {
+export const getUserById = async (id, options) => await useApi(`users/${id}`, {
+    ...options,
     transform: res => res.data,
     default: () => {},
     key: "get-user-by-id"

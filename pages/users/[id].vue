@@ -68,7 +68,7 @@
                 </div>
                 <h1 class="text-xl mt-8 ">{{userData.name}}</h1>
             </div>
-            <div class="max-md:-translate-y-28">
+            <div class="max-md:-translate-y-28 flex flex-col gap-2">
                 <NuxtLink :to="{name: 'login'}" class="text-center flex justify-center items-center gap-2 px-4 py-2 bg-black/50 hover:bg-black/75 transition-all duration-300 text-white dark:bg-dark-secondary mx-auto rounded-md" v-if="!user.authenticated">
                     <i class="bx bx-user-plus text-2xl"></i> Add Friends
                 </NuxtLink>
@@ -77,6 +77,12 @@
                         <i v-if="pendingFriendReq" class="bx bx-loader-alt bx-spin"></i>
                         <i v-else class="bx bx-user-plus text-2xl"></i>
                         Add Friends
+                    </p>
+                </button>
+                <button class="disabled:cursor-not-allowed flex justify-center items-center gap-2 px-4 py-2 bg-black/50 hover:bg-black/75 transition-all duration-300 text-white mx-auto rounded-md dark:bg-dark-secondary" v-if="user.authenticated && user._id != userData._id" @click="async () => {activeChat().value = userData._id; await navigateTo('/chats')}">
+                    <p class="flex justify-center items-center gap-2">
+                        <i class="bx bxl-messenger text-2xl"></i>
+                        Chat
                     </p>
                 </button>
                 <div class="flex flex-col gap-2">
