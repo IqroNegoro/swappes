@@ -43,14 +43,14 @@
                                     </p>
                                 </button>
                                 <button class="dark:hover:dark-hover p-1 text-left font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" @click="handleBookmarkPost" v-if="!post.bookmark">
-                                    <i v-if="pendingBookmark" class="bx bx-loading-alt bx-spin text-2xl"></i>
+                                    <i v-if="pendingBookmark" class="bx bx-loader-alt bx-spin text-2xl"></i>
                                     <i v-else class="bx bx-bookmark text-2xl"></i> 
                                     <p>
                                         Bookmark
                                     </p>
                                 </button>
                                 <button v-else class="dark:hover:dark-hover p-1 text-left font-semibold hover-bg w-full text-md flex justify-left rounded-lg items-center gap-2" @click="handleDeleteBookmarkPost">
-                                    <i v-if="pendingDelBookmark" class="bx bx-loading-alt bx-spin text-2xl"></i>
+                                    <i v-if="pendingDelBookmark" class="bx bx-loader-alt bx-spin text-2xl"></i>
                                     <i v-else class="bx bxs-bookmark text-2xl"></i> 
                                     <p>
                                         Bookmark

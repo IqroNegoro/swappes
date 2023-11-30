@@ -8,11 +8,15 @@
                     <p class="truncate">{{ chat.lastMessage?.content ?? "..." }}</p>
                 </div>
                 <span class="text-xs"> {{ moment(chat.updatedAt).format("LT") }} </span>
+                <template v-if="user._id == chat.lastMessage.user">
+                    <i v-if="chat.lastMessage.isRead" class="bx bx-check-double text-blue-400"></i>
+                    <i v-else class="bx bx-check"></i>
+                </template>
             </div>
         </div>
     </div>
 </template>
 <script setup>
 import moment from "moment";
-const { chat } = defineProps(["chat"]);
+const { chat, user } = defineProps(["chat", "user"]);
 </script>

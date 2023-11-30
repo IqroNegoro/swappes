@@ -5,7 +5,8 @@
             Bookmarks
         </h1>
         <div class="dark:text-white w-full flex flex-col gap-2">
-            <div v-if="errorBookmarks" class="flex justify-center items-center flex-col gap-4">
+            <BookmarkListSkeleton v-if="pendingBookmarks" />
+            <div v-else-if="errorBookmarks" class="flex justify-center items-center flex-col gap-4">
                 <i class="bx bx-error text-5xl"></i>
                 <h1 class="text-3xl">Something Wrong</h1>
                 <button class="rounded-sm dark:bg-dark-secondary px-3 py-1" @click="refreshBookmarks">
@@ -15,7 +16,7 @@
             <div v-else-if="!bookmarkLists.length && !bookmarks.length">It's seems that you not bookmark anything, bookmarks now for see later~</div>
             <BookmarkList v-else v-for="bookmark in bookmarkLists" :key="bookmark._id" :bookmark="bookmark" />
             <div ref="fetchPoint"></div>
-            <template v-if="bookmarks.length">
+            <template v-if="bookmarks.length >= limit">
                 <BookmarkListSkeleton v-for="bookmark in 6" :key="bookmark" />
             </template>
         </div>
@@ -29,21 +30,20 @@ const bookmarkLists = ref([]);
 
 const { data: bookmarks, error: errorBookmarks, pending: pendingBookmarks, refresh: refreshBookmarks } = await getBookmarks({
     params: {
-        limit,
-        skip
+        skip,
+        limit
     }
 });
 
 
 watch(bookmarks, bookmarks => {
-    console.log('watch', bookmarks)
     bookmarkLists.value = [...bookmarkLists.value, ...bookmarks]
 })
 
 onMounted(() => {
     if (fetchPoint.value) {
         useScroll(fetchPoint.value, () => {
-            if (bookmarks.value.length) {
+            if (bookmarkLists.value.length && bookmarks.value.length) {
                 skip.value += limit.value;
             }
         })

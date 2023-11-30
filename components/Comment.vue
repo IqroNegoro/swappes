@@ -105,7 +105,6 @@ const { data, error, pending, execute } = await deleteComment(comment.post, comm
 pending.value = false;
 
 const handleDeleteComment = async () => {
-    pending.value = true;
     await execute();
     if (error.value) {
         toast.value.push("Something went wrong");
@@ -114,7 +113,6 @@ const handleDeleteComment = async () => {
             emit("deleteComment", data.value)
         }
     }
-    pending.value = false;
 }
 </script>
 <style scoped>

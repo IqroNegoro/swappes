@@ -8,7 +8,7 @@
                 <template v-if="pendingChats">
                     <ChatListSkeleton v-for="i in 10" :key="i"  />
                 </template>
-                <ChatList v-else v-for="chat in chats" :key="chat._id" :chat="chat" @click="selectedChat = chat" />
+                <ChatList v-else v-for="chat in chats" :key="chat._id" :chat="chat" :user="user" @click="selectedChat = chat" />
             </div>
         </div>
         <div v-if="!selectedChat" class="max-md:w-full max-md:shrink-0 max-md:snap-center flex flex-col justify-center items-center">
@@ -33,15 +33,20 @@ onMounted(() => {
     socket.value.on("new-chat", chat => {
         const old = chats.value.find(v => v._id == chat._id);
         old.lastMessage = chat.lastMessage;
+        old.isRead = chat.isRead;
         old.updatedAt = chat.updatedAt;
         chats.value = chats.value.sort(v => v.updatedAt);
         if (chat.lastMessage.user != user._id) audio.play();
+    });
+    socket.value.on("readed-messages", chat => {
+        chats.value.find(v => v._id == chat._id).lastMessage = chat.lastMessage
     });
 });
 
 onUnmounted(() => {
     socket.value.emit("leave-chat");
     socket.value.off("new-chat");
+    socket.value.off("readed-messages");
     active.value = "";
 })
 

@@ -7,7 +7,8 @@ export const getChats = async id => await useApi(`chats`, {
     key: `get-chats`
 });
 
-export const getMessages = async id => await useApi(`chats/${id}/messages`, {
+export const getMessages = async (id, options) => await useApi(`chats/${id}/messages`, {
+    ...options,
     lazy: true,
     transform: res => res.data,
     default: () => [],
@@ -19,4 +20,11 @@ export const sendMessage = async (id, content) => await useApi(`chats/${id}/mess
     body: content,
     transform: res => res.data,
     key: `message-chat-${id}`
+})
+
+export const deleteMessage = async (id, messageId) => await useApi(`chats/${id}/messages/${messageId}`, {
+    method: "DELETE",
+    transform: res => res.data,
+    immediate: false,
+    key: `delete-message-${messageId}`
 })
