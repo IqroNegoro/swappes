@@ -133,6 +133,7 @@ onMounted(() => {
     socket.value.emit("join-chat", chat._id);
     socket.value.on("new-message", message => messageLists.value.push(message));
     socket.value.on("delete-message", message => messageLists.value = messageLists.value.filter(v => v._id != message._id));
+    socket.value.on("readed-message", message => messageLists.value.find(v => v._id == message._id).isRead = true);
     useScroll(fetchPoint.value, () => {
         if (messageLists.value.length && messages.value.length >= limit.value) {
             skip.value += limit.value;
@@ -144,6 +145,7 @@ onUnmounted(() => {
     socket.value.emit("leave-chat", chat._id);
     socket.value.off("new-message")
     socket.value.off("delete-message")
+    socket.value.off("readed-message");
 })
 </script>
 <style scoped>

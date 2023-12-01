@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-row gap-2 max-w-[75%] group">
+    <div ref="point" class="flex flex-row gap-2 max-w-[75%] group">
         <button v-if="user._id == message.user" class="self-center group-hover:opacity-100 group-hover:select-all opacity-0 select-none" @click="execute" :disabled="pending">
             <i v-if="pending" class="bx bx-loader-alt bx-spin"></i>
             <i v-else class="bx bx-trash"></i>
@@ -22,7 +22,18 @@
 <script setup>
 import moment from "moment";
 const { message, user } = defineProps(["message", "user"]);
+const socket = useSocket();
+
+const point = ref(undefined);
 
 const { data, pending, error, execute } = await deleteMessage(message.chat, message._id);
 pending.value = false;
+
+onMounted(() => {
+    if (!message.isRead && user._id != message.user) {
+        useScroll(point.value, () => {
+            socket.value.emit("readed-message", message)
+        }, true)
+    }
+})
 </script>
