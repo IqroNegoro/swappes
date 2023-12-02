@@ -84,6 +84,7 @@
                             <img :src="images.images" alt="attachments" class="w-full overflow-hidden" :class="{'aspect-square object-cover object-top': post.images.length > 1, 'col-span-2 h-64': i == 0 && post.images.length == 3}" loading="lazy">
                         </NuxtLink>
                     </div>
+                    <SharedPost v-if="post.share" :post="post.share" />
                     <div class="px-2">
                         <i class="bx bx-like"></i> {{ post.likes.length }}
                         <i class="bx bx-chat"></i> {{ post.totalComments }}
@@ -282,11 +283,11 @@ onMounted(() => {
     socket.value.emit("join-post", post.value?._id);
     socket.value.on("new-comment", comment => {
         comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply.push(comment) : comments.value.push(comment)
-        post.value.totalComments++
+        post.value.totalComments += 1
     });
     socket.value.on("delete-comment", comment => {
         comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply = comments.value.find(v => v._id == comment.replyId).reply.filter(v => v._id != comment._id) : comments.value = comments.value.filter(v => v._id != comment._id)
-        post.value.totalComments--
+        post.value.totalComments -= 1
     });
 
     if (descriptionContainer.value?.clientHeight < descriptionContainer.value?.scrollHeight) {

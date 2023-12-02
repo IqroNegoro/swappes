@@ -26,7 +26,7 @@
         </div>
         <Post v-else v-for="post in posts" :key="post._id" :post="post" @delete-post="id => posts = posts.filter(v => v._id != id)" @like-post="likes => posts.find(v => v._id == likes._id).likes = likes.likes" @select-post="id => showSelectedPost = id" @edit-post="id => editPost = id" @bookmark-post="bookmark => posts.find(v => v._id == bookmark.post).bookmark = bookmark" @delete-bookmark-post="bookmark => posts.find(v => v.bookmark?._id == bookmark._id).bookmark = null"  @share-post="id => sharePost = id" />
         <CreatePost v-if="createPostStatus" @new-post="post => posts.unshift(post)" @close-create-post-status="createPostStatus = false" />
-        <EditPost v-if="editPost" :id="editPost" @updated-post="post => posts.findIndex(v => v._id == post._id) >= 0 ? posts.splice(posts.findIndex(v => v._id == post._id), 1, post) : ''" @close-edit-post="editPost = null" />
+        <EditPost v-if="editPost" :id="editPost" @updated-post="post => posts.findIndex(v => v._id == post._id) >= 0 ? posts.splice(posts.findIndex(v => v._id == post._id), 1, {...post, share: posts.find(v => v._id == post._id).share}) : ''" @close-edit-post="editPost = null" />
         <SelectedPost v-if="showSelectedPost" :id="showSelectedPost" @delete-post="id => {posts = posts.filter(v => v._id != id); showSelectedPost = null}" @close-selected-post="showSelectedPost = null" @edit-post="id => {editPost = id; showSelectedPost = null}" @bookmark-post="bookmark => posts.find(v => v._id == bookmark.post).bookmark = bookmark" @delete-bookmark-post="bookmark => posts.find(v => v.bookmark?._id == bookmark._id).bookmark = null" />
         <SharePost v-if="sharePost" :id="sharePost" @close-share-status="sharePost = null" />
     </div>
@@ -34,6 +34,7 @@
 <script setup>
 const user = userStore();
 const { data: posts, pending, error, refresh } = await getPosts();
+console.log(posts.value)
 const createPostStatus = ref(false);
 const editPost = ref(null);
 const showSelectedPost = ref(null);

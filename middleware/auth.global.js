@@ -8,10 +8,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     if (await refreshLogin()) {
         const user = userStore();
         const socket = useSocket();
-        if (socket.value) {
+        user.$reset();
+        if (socket.value.connected) {
             socket.value.disconnect();
         }
-        user.$reset();
         return navigateTo("/login");
     }
 })

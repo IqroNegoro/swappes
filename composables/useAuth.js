@@ -46,6 +46,8 @@ export const logout = async () => {
     }
     
     const socket = useSocket();
+    const user = userStore();
+    user.$reset();
     socket.value.disconnect();
     toast.value.push("Logout Success")
     return navigateTo("/login");
