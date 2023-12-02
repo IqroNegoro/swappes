@@ -24,10 +24,11 @@
             <h1>It looks like you have been see all posts!</h1>
             <button @click="refresh" class="text-white bg-black/50 hover:bg-black/75 dark:bg-dark-secondary px-2 py-1 transition-all duration-300">Refresh</button>
         </div>
-        <Post v-else v-for="post in posts" :key="post._id" :post="post" @delete-post="id => posts = posts.filter(v => v._id != id)" @like-post="likes => posts.find(v => v._id == likes._id).likes = likes.likes" @select-post="id => showSelectedPost = id" @edit-post="id => editPost = id" @bookmark-post="bookmark => posts.find(v => v._id == bookmark.post).bookmark = bookmark" @delete-bookmark-post="bookmark => posts.find(v => v.bookmark?._id == bookmark._id).bookmark = null" />
+        <Post v-else v-for="post in posts" :key="post._id" :post="post" @delete-post="id => posts = posts.filter(v => v._id != id)" @like-post="likes => posts.find(v => v._id == likes._id).likes = likes.likes" @select-post="id => showSelectedPost = id" @edit-post="id => editPost = id" @bookmark-post="bookmark => posts.find(v => v._id == bookmark.post).bookmark = bookmark" @delete-bookmark-post="bookmark => posts.find(v => v.bookmark?._id == bookmark._id).bookmark = null"  @share-post="id => sharePost = id" />
         <CreatePost v-if="createPostStatus" @new-post="post => posts.unshift(post)" @close-create-post-status="createPostStatus = false" />
         <EditPost v-if="editPost" :id="editPost" @updated-post="post => posts.findIndex(v => v._id == post._id) >= 0 ? posts.splice(posts.findIndex(v => v._id == post._id), 1, post) : ''" @close-edit-post="editPost = null" />
         <SelectedPost v-if="showSelectedPost" :id="showSelectedPost" @delete-post="id => {posts = posts.filter(v => v._id != id); showSelectedPost = null}" @close-selected-post="showSelectedPost = null" @edit-post="id => {editPost = id; showSelectedPost = null}" @bookmark-post="bookmark => posts.find(v => v._id == bookmark.post).bookmark = bookmark" @delete-bookmark-post="bookmark => posts.find(v => v.bookmark?._id == bookmark._id).bookmark = null" />
+        <SharePost v-if="sharePost" :id="sharePost" @close-share-status="sharePost = null" />
     </div>
 </template>
 <script setup>
@@ -36,7 +37,7 @@ const { data: posts, pending, error, refresh } = await getPosts();
 const createPostStatus = ref(false);
 const editPost = ref(null);
 const showSelectedPost = ref(null);
-// const postingStatus = ref(false);
+const sharePost = ref(null);
 
 useHead({
     title: "Swappes"

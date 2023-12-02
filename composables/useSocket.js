@@ -14,11 +14,6 @@ export default () => {
             autoConnect: false,
             withCredentials: true
         });
-
-        socket.value.on("disconnect", () => {
-            console.log("njir dc");
-            socket.value.connect();
-        })
     }
     return socket;
 }

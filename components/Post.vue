@@ -58,8 +58,32 @@
                 Read More...
             </button>
         </div>
-        <div class="grid gap-1" :class="{'grid-cols-1 grid-rows-1': post.images.length == 1, 'grid-cols-2 grid-rows-1': post.images.length == 2, 'grid-cols-2 grid-rows-2': post.images.length == 3, 'grid-cols-2 grid-rows-2': post.images.length == 4}">
-            <img v-for="(images, i) in post.images" :key="images.discordId" :src="images.images" alt="attachments" class="w-full overflow-hidden cursor-pointer object-cover object-top" :class="{'aspect-square max-h-96': post.images.length > 1, 'col-span-2 object-center': i == 0 && post.images.length == 3}" loading="lazy" @click="$emit('selectPost', post._id)">
+        <div class="grid gap-1" :class="{'grid-cols-1 grid-rows-1': post.images.length == 1, 'grid-cols-2 grid-rows-1': post.images.length == 2, 'grid-cols-2 grid-rows-2': post.images.length == 3, 'grid-cols-2 grid-rows-2': post.images.length == 4}" @click="$emit('selectPost', post._id)">
+            <img v-for="(images, i) in post.images" :key="images.discordId" :src="images.images" alt="attachments" class="w-full overflow-hidden cursor-pointer object-cover object-top" :class="{'aspect-square max-h-96': post.images.length > 1, 'col-span-2 object-center': i == 0 && post.images.length == 3}" loading="lazy">
+        </div>
+        <div v-if="post.share" class="flex flex-col gap-4 border rounded-md mx-2">
+            <div class="flex items-center gap-2 px-1">
+                <NuxtLink :to="{name: 'users-id', params: {id: post.share.user._id}}">
+                    <img :src="post.share.user.avatar?.url" alt="" class="rounded-full w-8 h-8 object-cover"> 
+                </NuxtLink>
+                <div>
+                    <NuxtLink :to="{name: 'users-id', params: {id: post.share.user._id}}" class="text-sm font-bold">{{ post.share.user.name }}</NuxtLink>
+                    <p class="text-xs">{{ moment(post.share.createdAt).fromNow() }} &bull; <i class='bx bx-world'></i></p>
+                </div>
+            </div>
+            <div class="px-2 relative">
+                <p class="text-sm text-justify line-clamp-6 cursor-context-menu" ref="descriptionContainer" @click="handleOverflowing">
+                    {{ post.share.description }}
+                </p>
+                <button class="text-sm text-blue-500" @click="handleOverflowing" v-if="isOverflowing && !showLess">
+                    Read More...
+                </button>
+            </div>
+            <div class="grid gap-1" :class="{'grid-cols-1 grid-rows-1': post.share.images.length == 1, 'grid-cols-2 grid-rows-1': post.share.images.length == 2, 'grid-cols-2 grid-rows-2': post.share.images.length == 3, 'grid-cols-2 grid-rows-2': post.share.images.length == 4}">
+                <div v-for="(images, i) in post.share.images" :key="images.discordId" :class="{'col-span-2': i == 0 && post.share.images.length == 3}">
+                    <img :src="images.images" alt="attachments" class="w-full overflow-hidden" :class="{'aspect-square object-cover object-top': post.share.images.length > 1, 'col-span-2 h-64': i == 0 && post.share.images.length == 3}" loading="lazy">
+                </div>
+            </div>
         </div>
         <div class="px-2">
             <i class="bx bx-like"></i> {{ post.likes.length }}
@@ -76,7 +100,7 @@
                 <i class='bx bx-chat'></i>
                 <span>Comment</span>
             </button>
-            <button class="action-post">
+            <button class="action-post" @click="$emit('sharePost', post._id)">
                 <i class='bx bx-share bx-flip-horizontal'></i>
                 <span>Share</span>
             </button>
@@ -97,7 +121,7 @@
 </template>
 <script setup>
 import moment from "moment";
-const emit = defineEmits(["selectPost", "deletePost", "likePost", "bookmarkPost", "deleteBookmarkPost"]);
+const emit = defineEmits(["selectPost", "deletePost", "likePost", "sharePost", "bookmarkPost", "deleteBookmarkPost"]);
 const { post } = defineProps(["post"]);
 const toast = useToast();
 const user = userStore();
