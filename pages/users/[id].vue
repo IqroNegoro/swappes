@@ -174,7 +174,8 @@ const showFullBanner = ref(false);
 const renderImage = file => URL.createObjectURL(file);
 
 const { data: userData, error: userError, pending: pendingUser, refresh: refreshUser } = await getUserById(id);
-if (!userData.value) {
+
+if (!userError.value?.statusCode === 404) {
     throw createError({statusCode: 404, statusMessage: "User Doesnt Exist"});
 }
 

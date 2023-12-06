@@ -34,7 +34,6 @@
 <script setup>
 const user = userStore();
 const { data: posts, pending, error, refresh } = await getPosts();
-console.log(posts.value)
 const createPostStatus = ref(false);
 const editPost = ref(null);
 const showSelectedPost = ref(null);

@@ -3,15 +3,24 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         document.documentElement.classList.add("dark")
         return;
     }
-    let whitelist = ["login", "register"];
-    if (whitelist.includes(to.name) || whitelist.includes(from.name)) return;
-    if (await refreshLogin()) {
-        const user = userStore();
-        const socket = useSocket();
+    let { data, error } = await useApi("info", {
+        key: "info",
+    })
+        console.log(to.name, from.name)
+    const user = userStore();
+    const socket = useSocket();
+    
+    if (error.value) {
         user.$reset();
-        if (socket.value.connected) {
-            socket.value.disconnect();
-        }
-        return navigateTo("/login");
+        socket.value?.disconnect();
+        if (to.name != "login") return await navigateTo("/login");
+    }
+
+    if (data.value) {
+        user.$patch({
+            ...data.value,
+            authenticated: true
+        });
+        if (to.name == "login") return await navigateTo("/");
     }
 })

@@ -3,11 +3,11 @@ export default defineNuxtRouteMiddleware((to, from) => {
         const socket = useSocket();
         const user = userStore();
         if (user.authenticated) {
-            if (!socket.value.connected) {
-                socket.value.connect();
+            if (!socket.value?.connected) {
+                socket.value?.connect();
             }
         } else {
-            socket.value.disconnect();
+            socket.value?.disconnect();
         }
     }
 })
