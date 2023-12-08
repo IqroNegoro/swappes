@@ -1,13 +1,19 @@
 <template>
     <div class="dark:text-white fixed top-0 left-0 h-full w-full flex flex-row max-md:snap-x max-md:snap-mandatory max-md:overflow-x-scroll md:grid md:grid-rows-1 md:grid-cols-[minmax(0,1fr),minmax(0,2fr)] dark:bg-dark-primary">
         <div class="flex flex-col max-md:w-full max-md:shrink-0 max-md:snap-center">
-            <div class="p-4 flex justify-start items-center w-full">
+            <div class="p-4 flex justify-start items-center w-full gap-4">
+                <NuxtLink :to="{name: 'index'}" class="text-2xl flex justify-center items-center">
+                    <i class="bx bx-arrow-back"></i>
+                </NuxtLink>
                 <h1 class="font-semibold text-2xl">Chats</h1>
             </div>
             <div class="flex flex-col overflow-y-auto h-full light-scrollbar">
                 <template v-if="pendingChats">
                     <ChatListSkeleton v-for="i in 10" :key="i"  />
                 </template>
+                <div v-if="!chats.length">
+                    <h1 class="text-center">Start send message with someone!</h1>
+                </div>
                 <ChatList v-else v-for="chat in chats" :key="chat._id" :chat="chat" :user="user" @click="selectedChat = chat" />
             </div>
         </div>

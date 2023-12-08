@@ -22,9 +22,9 @@ export const logout = async () => {
         method: "DELETE",
         key: "logout"
     });
-
+    
     const toast = useToast();
-
+    
     if (error.value) {
         toast.value.push(`Something Went Wrong, ${error.value.statusCode}`)
         return;
@@ -33,7 +33,7 @@ export const logout = async () => {
     const socket = useSocket();
     const user = userStore();
     user.$reset();
-    socket.value.disconnect();
+    socket.value?.disconnect();
     toast.value.push("Logout Success")
     return navigateTo("/login");
 };

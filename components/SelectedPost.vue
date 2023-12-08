@@ -278,9 +278,15 @@ const escClick = ({code}) => {
     if (code == "Escape") emit("closeSelectedPost");
 }
 
+watch(post, val => {
+    if (val) {
+        socket.value.emit("join-post", val._id);
+    }
+})
+
 onMounted(() => {
     document.addEventListener("keydown", escClick)
-    socket.value.emit("join-post", post.value?._id);
+    // socket.value.emit("join-post", post.value?._id);
     socket.value.on("new-comment", comment => {
         comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply.push(comment) : comments.value.push(comment)
         post.value.totalComments += 1

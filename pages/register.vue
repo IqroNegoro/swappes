@@ -72,8 +72,6 @@ const handleRegister = async () => {
     return navigateTo("/login");
 }
 
-if (!await refreshLogin()) navigateTo("/");
-
 definePageMeta({
     layout: false
 })

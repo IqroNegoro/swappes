@@ -1,19 +1,19 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
     if (process.client) {
         document.documentElement.classList.add("dark")
-        return;
     }
+
     let { data, error } = await useApi("info", {
         key: "info",
     })
-        console.log(to.name, from.name)
+
     const user = userStore();
     const socket = useSocket();
-    
+
     if (error.value) {
         user.$reset();
         socket.value?.disconnect();
-        if (to.name != "login") return await navigateTo("/login");
+        if (to.name != "login" && from.name != "login") return await navigateTo("/login");
     }
 
     if (data.value) {
