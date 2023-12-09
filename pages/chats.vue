@@ -25,15 +25,13 @@
     </div>
 </template>
 <script setup>
-const active = activeChat();
 const user = userStore();
-const selectedChat = ref(active.value ? {user: {_id: active.value}} : undefined);
+const selectedChat = ref(undefined);
 const message = ref("");
 const socket = useSocket();
 const container = ref(undefined);
 
 const { data: chats, pending: pendingChats, error: errorChat, refresh: refreshChat } = await getChats();
-
 
 onMounted(() => {
     watch(selectedChat, async val => {
@@ -53,8 +51,7 @@ onMounted(() => {
             old.updatedAt = chat.updatedAt;
             chats.value = chats.value.sort(v => v.updatedAt);
         } else {
-            chats.value.push(chat);    
-            selectedChat.value = chat._id
+            chats.value.unshift(chat);    
         }
         if (chat.lastMessage.user != user._id) audio.play();
     });
@@ -67,7 +64,6 @@ onUnmounted(() => {
     socket.value.emit("leave-chat");
     socket.value.off("new-chat");
     socket.value.off("readed-messages");
-    active.value = "";
 })
 
 definePageMeta({

@@ -105,7 +105,6 @@ const user = userStore();
 const socket = useSocket();
 const rooms = roomsStore();
 const showPostMenu = ref(false);
-const divComment = ref(undefined);
 const comment = ref('');
 const confirmDeletePost = ref(false);
 

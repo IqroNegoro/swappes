@@ -15,7 +15,7 @@
             </p>
             <button @click="refresh" class="text-white bg-black/50 hover:bg-black/75 dark:bg-dark-secondary px-2 py-1 transition-all duration-300">Try Again</button>
         </div>
-        <div v-else-if="!posts.length && !postsList.length" class="flex justify-center dark:bg-dark-primary dark:text-white items-center flex-col bg-white shadow-md h-96">
+        <div v-else-if="!posts.length && !postsList.length && !pending" class="flex justify-center dark:bg-dark-primary dark:text-white items-center flex-col bg-white shadow-md h-96">
             <i class='bx bx-check text-7xl'></i>
             <h1>It looks like you have been see all posts!</h1>
             <button @click="refresh" class="text-white bg-black/50 hover:bg-black/75 dark:bg-dark-secondary px-2 py-1 transition-all duration-300">Refresh</button>
@@ -40,23 +40,27 @@ const editPost = ref(null);
 const showSelectedPost = ref(null);
 const sharePost = ref(null);
 
-const { data: posts, pending, error, refresh } = await getPosts({
+const { data: posts, pending, error, refresh } = await useFetch("posts", {
     params: {
         skip,
         limit
     },
+    default: () => [],
+    transform: res => res.data,
+    lazy: true,
+    headers: useRequestHeaders(["cookie"]),
+    credentials: "include",
+    baseURL: process.env.NODE_ENV === "production" ? "https://api.swappes.my.id/" : "http://localhost:3001/"
 });
 
 watch(posts, posts => {
-    postsList.value.push(...posts);
-}, {
-    immediate: true
-})
+    postsList.value = [...postsList.value, ...posts]
+});
 
 onMounted(() => {
     useScroll(fetchPoint.value, () => {
         if (postsList.value.length && posts.value.length >= limit.value && !pending.value) {
-            skip.value += 10;
+            skip.value += limit.value;
         }
     })
 })

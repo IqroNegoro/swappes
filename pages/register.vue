@@ -55,6 +55,7 @@ const email = ref(NODE_ENV == "production" ? "" : "emilico@gmail.com");
 const password = ref(NODE_ENV == "production" ? "" : "emilico");
 const pending = ref(false);
 const errors = ref()
+const toast = useToast();
 
 const handleRegister = async () => {
     if (!name.value || !email.value || !password.value) return;
@@ -68,7 +69,7 @@ const handleRegister = async () => {
         pending.value = false;
         return;
     }
-
+    toast.value.push("Register success, please log in");
     return navigateTo("/login");
 }
 

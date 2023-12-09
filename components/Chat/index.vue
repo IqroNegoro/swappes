@@ -78,13 +78,11 @@ const { data: messages, pending: pendingMessages, error: errorMessages, refresh:
         limit
     },
 });
-pendingMessages.value = false;
-if (chat._id) {
-    await refreshMessages();
-}
 
 watch(messages, messages => {
     messageLists.value = [...messages.sort((a,b) => +new Date(a.createdAt) - +new Date(b.createdAt)), ...messageLists.value]
+}, {
+    immediate: true
 })
 
 watch(box, box => {
@@ -134,9 +132,7 @@ const handlePostMessage = async () => {
 }
 
 onMounted(() => {
-    if (chat._id) {
-        socket.value.emit("join-chat", chat._id);
-    }
+    socket.value.emit("join-chat", chat._id);
     socket.value.on("new-message", message => messageLists.value.push(message));
     socket.value.on("delete-message", message => messageLists.value = messageLists.value.filter(v => v._id != message._id));
     socket.value.on("readed-message", message => messageLists.value.find(v => v._id == message._id).isRead = true);

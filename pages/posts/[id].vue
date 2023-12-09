@@ -75,7 +75,7 @@
                         <i class='bx bx-like' v-else></i>
                         <span>Like</span>
                     </button>
-                    <button class="action-post">
+                    <button class="action-post" @click="sharePost = post._id">
                         <i class='bx bx-share bx-flip-horizontal'></i>
                         <span>Share</span>
                     </button>
@@ -104,24 +104,26 @@
             <div class="relative w-full rounded-md shadow-sm p-4 gap-4 flex justify-center items-center flex-nowrap">
                 <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-20" v-if="pendingSendComment"></div>
                 <img :src="user.avatar?.url" alt="" class="rounded-full w-8 h-8 object-cover aspect-square">
-                <div ref="divComment" contenteditable="true" placeholder="Write your comment..." class="min-h-[40px] max-h-48 overflow-y-auto cursor-pointer rounded-lg w-full text-left bg-black/10 px-4 py-2 font-light outline-none" @input="({target}) => comment = target.innerText" @keydown.ctrl.enter="handlePostComment" autofocus></div>
-                <div class="flex dark:text-white">
+                <div ref="divComment" contenteditable="true" placeholder="Write your comment..." class="min-h-[40px] max-h-48 overflow-y-auto cursor-pointer rounded-lg w-full text-left bg-black/10 px-4 py-2 font-light outline-none text-white" @input="({target}) => comment = target.innerText" @keydown.ctrl.enter="handlePostComment" autofocus></div>
+                <div class="flex dark:text-white relative">
                     <label for="imagesInput" class="cursor-pointer flex justify-center items-center px-1 text-xl">
                         <i class="bx bx-camera"></i>
                     </label>
                     <input ref="inputImage" type="file" name="image" accept=".jpg,.jpeg,.png,.webp" id="imagesInput" class="hidden" @input="handleInputFile">
-                    <button class="flex justify-center items-center px-1 text-xl" @click="handlePostComment">
-                        <i class="bx bx-send"></i>
+                    <button class="flex justify-center items-center px-1 text-xl" @click="handlePostComment" :disabled="!comment.trim() && !image">
+                        <i class="bx" :class="{'bx-send': !comment.trim() && !image, 'bxs-send': comment.trim() || image}"></i>
                     </button>
                 </div>
             </div>
             <div class="relative w-full flex justify-center items-center overscroll-contain" v-if="image">
+                <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-20" v-if="pendingSendComment"></div>
                 <button class="absolute dark:bg-dark-primary dark:text-white top-0 right-0 flex justify-center items-center px-1 bg-white rounded-full m-1" @click="() => {image = ''; inputImage.value = ''}">
                     <i class="bx bx-x text-xl rounded-full"></i>
                 </button>
                 <img :src="renderImage(image)" class="w-32">
             </div>
         </div>
+        <SharePost v-if="sharePost" :id="sharePost" @close-share-status="sharePost = null" />
     </div>
 </template>
 <script setup>
@@ -129,6 +131,7 @@ import moment from "moment";
 const user = userStore();
 const toast = useToast();
 const socket = useSocket();
+const sharePost = ref(null);
 
 const { id } = useRoute().params;
 
@@ -153,6 +156,7 @@ const divComment = ref(undefined);
 const comment = ref("");
 const rooms = roomsStore();
 const image = ref(null);
+const inputImage = ref(undefined);
 
 const isOverflowing = ref(false);
 const showPostMenu = ref(false);
@@ -211,7 +215,7 @@ const handleLikePost = async () => {
 }
 
 const handlePostComment = async () => {
-    if (!comment.value) return;
+    if (!comment.value && !image.value) return;
     pendingSendComment.value = true;
     let fd = new FormData();
     fd.append("comment", comment.value)

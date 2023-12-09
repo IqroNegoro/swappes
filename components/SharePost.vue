@@ -80,7 +80,6 @@ const handleOverflowing = () => {
 }
 
 const { data: post, pending: pendingPost, error: errorPost, refresh: refreshPost } = await getPost(id, {
-    pick: ["_id", "user", "images", "description", "createdAt", "updatedAt"],
     lazy: true
 })
 

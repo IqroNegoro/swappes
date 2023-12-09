@@ -129,7 +129,7 @@
                             <i class="bx bx-camera"></i>
                         </label>
                         <input ref="inputImage" type="file" name="image" accept=".jpg,.jpeg,.png,.webp" id="imagesInput" class="hidden" @input="handleInputFile">
-                        <button class="flex justify-center items-center px-1 text-xl" @click="handlePostComment">
+                        <button class="flex justify-center items-center px-1 text-xl" @click="handlePostComment" :disabled="!comment.trim() || !image">
                             <i class="bx" :class="{'bx-send': !comment.trim(), 'bxs-send': comment.trim()}"></i>
                         </button>
                     </div>
