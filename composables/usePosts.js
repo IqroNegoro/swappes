@@ -1,4 +1,6 @@
-export const getPosts = async () => await useApi("posts", {
+export const getPosts = async options => await useApi("posts", {
+    ...options,
+    lazy: true,
     transform: res => res.data,
     default: () => [],
     key: "get-posts",

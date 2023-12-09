@@ -207,7 +207,6 @@ const handleLikePost = async () => {
         toast.value.push("Something went wrong when liking post");
     } else {
         post.value.likes = like.value.likes
-        console.log(post.value.likes, like.value.likes)
     }
 }
 

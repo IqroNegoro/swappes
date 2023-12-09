@@ -37,12 +37,17 @@ const { data: friends, error: errorFriends, pending: pendingFriends, refresh: re
     },
 });
 
+watch(friends, friends => {
+    friendLists.value.push(...friends)
+}, {
+    immediate: true
+})
+
 onMounted(() => {
     if (fetchPoint.value) {
         useScroll(fetchPoint.value, () => {
-            if (friends.value.length) {
+            if (friends.value.length >= limit.value && !pendingFriends.value) {
                 skip.value += 20
-                friendLists.value = [...friendLists.value, ...friends.value]
             }
         })
     }

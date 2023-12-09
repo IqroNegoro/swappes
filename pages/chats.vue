@@ -1,5 +1,5 @@
 <template>
-    <div class="dark:text-white fixed top-0 left-0 h-full w-full flex flex-row max-md:snap-x max-md:snap-mandatory max-md:overflow-x-scroll md:grid md:grid-rows-1 md:grid-cols-[minmax(0,1fr),minmax(0,2fr)] dark:bg-dark-primary">
+    <div ref="container" class="dark:text-white fixed top-0 left-0 h-full w-full flex flex-row max-md:snap-x max-md:snap-mandatory max-md:overflow-x-scroll md:grid md:grid-rows-1 md:grid-cols-[minmax(0,1fr),minmax(0,2fr)] dark:bg-dark-primary">
         <div class="flex flex-col max-md:w-full max-md:shrink-0 max-md:snap-center">
             <div class="p-4 flex justify-start items-center w-full gap-4">
                 <NuxtLink :to="{name: 'index'}" class="text-2xl flex justify-center items-center">
@@ -27,21 +27,35 @@
 <script setup>
 const active = activeChat();
 const user = userStore();
-const selectedChat = ref(active.value || undefined);
+const selectedChat = ref(active.value ? {user: {_id: active.value}} : undefined);
 const message = ref("");
 const socket = useSocket();
+const container = ref(undefined);
 
 const { data: chats, pending: pendingChats, error: errorChat, refresh: refreshChat } = await getChats();
 
+
 onMounted(() => {
+    watch(selectedChat, async val => {
+        if (val?._id) {
+            container.value?.scrollTo(9999999, 0)
+        } else {
+            container.value?.scrollTo(0, 0)
+        }
+    })
     const audio = new Audio("/sfx/messages.mp3");
     socket.value.emit("join-chat", user._id);
     socket.value.on("new-chat", chat => {
         const old = chats.value.find(v => v._id == chat._id);
-        old.lastMessage = chat.lastMessage;
-        old.isRead = chat.isRead;
-        old.updatedAt = chat.updatedAt;
-        chats.value = chats.value.sort(v => v.updatedAt);
+        if (old) {
+            old.lastMessage = chat.lastMessage;
+            old.isRead = chat.isRead;
+            old.updatedAt = chat.updatedAt;
+            chats.value = chats.value.sort(v => v.updatedAt);
+        } else {
+            chats.value.push(chat);    
+            selectedChat.value = chat._id
+        }
         if (chat.lastMessage.user != user._id) audio.play();
     });
     socket.value.on("readed-messages", chat => {

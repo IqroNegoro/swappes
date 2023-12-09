@@ -5,9 +5,11 @@ export const getUserById = async (id, options) => await useApi(`users/${id}`, {
     key: "get-user-by-id"
 })
 
-export const getUserPosts = async id => await useApi(`users/${id}/posts`, {
+export const getUserPosts = async (id, options) => await useApi(`users/${id}/posts`, {
+    ...options,
     transform: res => res.data,
     default: () => [],
+    lazy: true,
     key: "get-user-posts"
 })
 

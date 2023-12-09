@@ -10,6 +10,7 @@ export const getChats = async id => await useApi(`chats`, {
 export const getMessages = async (id, options) => await useApi(`chats/${id}/messages`, {
     ...options,
     lazy: true,
+    immediate: false,
     transform: res => res.data,
     default: () => [],
     key: `get-${id}-messages`

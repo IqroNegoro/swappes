@@ -78,6 +78,10 @@ const { data: messages, pending: pendingMessages, error: errorMessages, refresh:
         limit
     },
 });
+pendingMessages.value = false;
+if (chat._id) {
+    await refreshMessages();
+}
 
 watch(messages, messages => {
     messageLists.value = [...messages.sort((a,b) => +new Date(a.createdAt) - +new Date(b.createdAt)), ...messageLists.value]
@@ -110,7 +114,7 @@ const handlePostMessage = async () => {
     let fd = new FormData();
     fd.append("content", content.value)
     fd.append("image", image.value)
-    const { data, error } = await sendMessage(chat._id, fd);
+    const { data, error } = await sendMessage(chat._id ?? chat.user._id, fd);
     pendingSendMessage.value = false;
     if (error.value) {
         error.value.data.errors.forEach(v => {
@@ -130,12 +134,14 @@ const handlePostMessage = async () => {
 }
 
 onMounted(() => {
-    socket.value.emit("join-chat", chat._id);
+    if (chat._id) {
+        socket.value.emit("join-chat", chat._id);
+    }
     socket.value.on("new-message", message => messageLists.value.push(message));
     socket.value.on("delete-message", message => messageLists.value = messageLists.value.filter(v => v._id != message._id));
     socket.value.on("readed-message", message => messageLists.value.find(v => v._id == message._id).isRead = true);
     useScroll(fetchPoint.value, () => {
-        if (messageLists.value.length && messages.value.length >= limit.value) {
+        if (messageLists.value.length && messages.value.length >= limit.value && !pendingMessages.value) {
             skip.value += limit.value;
         }
     });

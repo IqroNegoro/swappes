@@ -32,10 +32,6 @@
         <div class="dark:bg-dark-primary dark:text-white w-full flex flex-col md:grid grid-cols-3 grid-rows-1 justify-between items-center bg-white gap-4 px-8">
             <div class="max-md:-translate-y-28 flex justify-center items-center text-center gap-4 font-semibold">
                 <p>
-                    {{ posts.length }} <br>
-                    Posts
-                </p>
-                <p>
                     {{ userData.friends }} <br>
                     Friends
                 </p>
@@ -79,12 +75,6 @@
                         Add Friends
                     </p>
                 </button>
-                <button class="disabled:cursor-not-allowed flex justify-center items-center gap-2 px-4 py-2 bg-black/50 hover:bg-black/75 transition-all duration-300 text-white mx-auto rounded-md dark:bg-dark-secondary" v-if="user.authenticated && user._id != userData._id" @click="async () => {activeChat().value = userData._id; await navigateTo('/chats')}">
-                    <p class="flex justify-center items-center gap-2">
-                        <i class="bx bxl-messenger text-2xl"></i>
-                        Chat
-                    </p>
-                </button>
                 <div class="flex flex-col gap-2">
                     <button class="disabled:cursor-not-allowed flex justify-center items-center gap-2 px-4 py-2 bg-blue/50 hover:bg-blue/75 transition-all duration-300 text-white mx-auto rounded-md dark:bg-blue-500 dark:hover:bg-blue-600" v-if="user.authenticated && user._id != userData._id && userData.isFriend?.status == 0 && userData.isFriend?.to == user._id" @click="handleAcceptFriendRequest">
                         <p class="flex justify-center items-center gap-2">
@@ -105,6 +95,12 @@
                     <p class="flex justify-center items-center gap-2">
                         <i v-if="pendingDelFriend" class="bx bx-loader-alt bx-spin"></i>
                         <i v-else class="bx bx-user-check text-2xl"></i>Friend
+                    </p>
+                </button>
+                <button class="disabled:cursor-not-allowed flex justify-center items-center gap-2 px-4 py-2 bg-black/50 hover:bg-black/75 transition-all duration-300 text-white mx-auto rounded-md dark:bg-dark-secondary" v-if="user.authenticated && user._id != userData._id" @click="async () => {activeChat().value = userData._id; await navigateTo('/chats')}">
+                    <p class="flex justify-center items-center gap-2">
+                        <i class="bx bxl-messenger text-2xl"></i>
+                        Chat
                     </p>
                 </button>
             </div>
@@ -135,25 +131,26 @@
                 <!-- <div class="shadow-sm p-2 animate-pulse" v-if="postingStatus">
                     <h1 class="dark:text-white">Posting...</h1>
                 </div> -->
-                <PostSkeleton v-if="pendingPosts" />
-                <div v-else-if="errorPosts" class="flex flex-col justify-center gap-2 items-center py-3">
+                <div v-if="errorPosts" class="flex flex-col justify-center gap-2 items-center py-3">
                     <p class="dark:text-white">
                         Something Went Wrong
                     </p>
                     <button @click="refreshPosts" class="text-white bg-black/50 hover:bg-black/75 dark:bg-dark-secondary px-2 py-1 transition-all duration-300">Try Again</button>
                 </div>
-                <div v-else-if="!posts.length" class="flex justify-center dark:bg-dark-primary dark:text-white items-center flex-col bg-white shadow-md h-96">
+                <div v-else-if="!posts.length && !postsList.length" class="flex justify-center dark:bg-dark-primary dark:text-white items-center flex-col bg-white shadow-md h-96">
                     <i class='bx bx-check text-7xl'></i>
-                    <h1>It looks like you have been see all posts!</h1>
-                    <button @click="refreshPosts" class="text-white bg-black/50 hover:bg-black/75 dark:bg-dark-secondary px-2 py-1 transition-all duration-300">Refresh</button>
+                    <h1>{{ userData.name }} doesnt have any post!</h1>
                 </div>
-                <Post v-else v-for="post in posts" :key="post._id" :post="post" @delete-post="id => posts = posts.filter(v => v._id != id)" @like-post="likes => posts.find(v => v._id == likes._id).likes = likes.likes" @select-post="id => showSelectedPost = id" @edit-post="id => editPost = id" @bookmark-post="bookmark => posts.find(v => v._id == bookmark.post).bookmark = bookmark" @delete-bookmark-post="bookmark => posts.find(v => v.bookmark?._id == bookmark._id).bookmark = null"  @share-post="id => sharePost = id" />
+                <Post v-else v-for="post in postsList" :key="post._id" :post="post" @delete-post="id => postsList = postsList.filter(v => v._id != id)" @like-post="likes => postsList.find(v => v._id == likes._id).likes = likes.likes" @select-post="id => showSelectedPost = id" @edit-post="id => editPost = id" @bookmark-post="bookmark => postsList.find(v => v._id == bookmark.post).bookmark = bookmark" @delete-bookmark-post="bookmark => postsList.find(v => v.bookmark?._id == bookmark._id).bookmark = null"  @share-post="id => sharePost = id" />
+                <div ref="fetchPoint"></div>
+                <PostSkeleton v-if="posts.length >= limit || pendingPosts" />
             </div>
         </div>
-        <CreatePost v-if="createPostStatus" @new-post="post => posts.unshift(post)" @close-create-post-status="createPostStatus = false" />
-        <EditPost v-if="editPost" :id="editPost" @updated-post="post => posts.findIndex(v => v._id == post._id) >= 0 ? posts.splice(posts.findIndex(v => v._id == post._id), 1, {...post, share: posts.find(v => v._id == post._id).share}) : ''" @close-edit-post="editPost = null" />
-        <SelectedPost v-if="showSelectedPost" :id="showSelectedPost" @delete-post="id => {posts = posts.filter(v => v._id != id); showSelectedPost = null}" @close-selected-post="showSelectedPost = null" @edit-post="id => {editPost = id; showSelectedPost = null}" @bookmark-post="bookmark => posts.find(v => v._id == bookmark.post).bookmark = bookmark" @delete-bookmark-post="bookmark => posts.find(v => v.bookmark?._id == bookmark._id).bookmark = null" />
+        <CreatePost v-if="createPostStatus" @new-post="post => postsList.unshift(post)" @close-create-post-status="createPostStatus = false" />
+        <EditPost v-if="editPost" :id="editPost" @updated-post="post => postsList.findIndex(v => v._id == post._id) >= 0 ? postsList.splice(postsList.findIndex(v => v._id == post._id), 1, {...post, share: postsList.find(v => v._id == post._id).share}) : ''" @close-edit-post="editPost = null" />
+        <SelectedPost v-if="showSelectedPost" :id="showSelectedPost" @delete-post="id => {posts = postsList.filter(v => v._id != id); showSelectedPost = null}" @close-selected-post="showSelectedPost = null" @edit-post="id => {editPost = id; showSelectedPost = null}" @bookmark-post="bookmark => postsList.find(v => v._id == bookmark.post).bookmark = bookmark" @delete-bookmark-post="bookmark => postsList.find(v => v.bookmark?._id == bookmark._id).bookmark = null" />
         <SharePost v-if="sharePost" :id="sharePost" @close-share-status="sharePost = null" />
+        <ShowFriends v-if="showUserFriends" :id="id" :name="userData.name" @close-user-friends="showUserFriends = false" />
     </div>
 </template>
 <script setup>
@@ -161,6 +158,10 @@ const { id } = useRoute().params;
 const user = userStore();
 const toast = useToast();
 
+const skip = ref(0);
+const limit = ref(10);
+const fetchPoint = ref(undefined);
+const postsList = ref([]);
 const showUserFriends = ref(false);
 const createPostStatus = ref(false);
 const editPost = ref(null);
@@ -179,7 +180,12 @@ if (!userError.value?.statusCode === 404) {
     throw createError({statusCode: 404, statusMessage: "User Doesnt Exist"});
 }
 
-const { data: posts, error: errorPosts, pending: pendingPosts, refresh: refreshPosts } = await getUserPosts(id);
+const { data: posts, error: errorPosts, pending: pendingPosts, refresh: refreshPosts } = await getUserPosts(id, {
+    params: {
+        skip,
+        limit
+    }
+});
 const { data: friends, error: errorFriends, pending: pendingFriends, refresh: refreshFriends } = await getUserFriends(id)
 const { data: friendReq, error: errorFriendReq, pending: pendingFriendReq, execute: executeFriendReq } = await friendRequest(id)
 const { data: acceptFriend, error: errorAcceptFriend, pending: pendingAcceptFriend, execute: executeAcceptFriend } = await acceptFriendRequest(id)
@@ -190,6 +196,12 @@ const pendingBanner = ref(false);
 pendingFriendReq.value = false;
 pendingAcceptFriend.value = false;
 pendingDelFriend.value = false;
+
+watch(posts, posts => {
+    postsList.value.push(...posts);
+}, {
+    immediate: true
+})
 
 const handleFriendRequest = async () => {
     await executeFriendReq();
@@ -287,6 +299,14 @@ const handleAvatar = async () => {
 
     toast.value.push("Profile images changed");
 }
+
+onMounted(() => {
+    useScroll(fetchPoint.value, () => {
+        if (postsList.value.length && posts.value.length >= limit.value && !pendingPosts.value) {
+            skip.value += 10;
+        }
+    })
+})
 
 definePageMeta({
     layout: "full",
