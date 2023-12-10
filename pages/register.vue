@@ -70,7 +70,7 @@ const handleRegister = async () => {
         return;
     }
     toast.value.push("Register success, please log in");
-    return navigateTo("/login");
+    return await navigateTo("/login");
 }
 
 definePageMeta({

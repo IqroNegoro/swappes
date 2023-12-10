@@ -70,7 +70,7 @@ const handleLogin = async () => {
         authenticated: true
     })
 
-    return navigateTo("/");
+    return await navigateTo("/");
 }
 
 definePageMeta({

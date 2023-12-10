@@ -11,12 +11,14 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     const socket = useSocket();
 
     if (error.value) {
+        console.log("error", error.value)
         user.$reset();
         socket.value?.disconnect();
         if (to.name != "login" && from.name != "login") return await navigateTo("/login");
     }
-
+    
     if (data.value) {
+        console.log("data", data.value)
         user.$patch({
             ...data.value,
             authenticated: true
