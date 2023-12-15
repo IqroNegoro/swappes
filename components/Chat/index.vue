@@ -15,9 +15,9 @@
                 <h1>{{ userData.name }}</h1>
             </div>
         </div>
-        <div ref="box" class="w-full h-full overflow-y-scroll light-scrollbar flex flex-col p-4 gap-4">
+        <div ref="box" class="relative w-full h-full overflow-y-scroll light-scrollbar flex flex-col p-4 gap-4">
             <template v-if="messages.length >= limit">
-                <div class="relative h-8 p-4 w-64 skeleton rounded-md" :class="{'self-start': i % 2 == 0, 'self-end': i % 2 == 1}" v-for="i in 8" :key="i"></div>
+                <div class="relative h-8 p-4 w-64 skeleton rounded-md" :class="{'self-start': i % 2 == 0, 'self-end': i % 2 == 1}" v-for="i in 4" :key="i"></div>
             </template>
             <div ref="fetchPoint" class=""></div>
             <p class="self-center px-4 py-2 bg-dark-secondary rounded-full" v-if="!messages.length && !messageLists.length && !pendingMessages">Ready for memorable moment?</p>
@@ -54,6 +54,7 @@
 </template>
 <script setup>
 const { chat } = defineProps(["chat"]);
+const emit = defineEmits(["lastMessageReaded", "closeChat"])
 const socket = useSocket();
 const toast = useToast();
 const user = userStore();
@@ -70,7 +71,6 @@ const fetchPoint = ref(null);
 const messageLists = ref([]);
 
 const renderImage = file => URL.createObjectURL(file);
-
 const { data: userData, pending: pendingUser, error: errorUser, refresh: refreshUser } = await getUserById(chat.user._id);
 const { data: messages, pending: pendingMessages, error: errorMessages, refresh: refreshMessages } = await getMessages(chat._id, {
     params: {
@@ -81,17 +81,7 @@ const { data: messages, pending: pendingMessages, error: errorMessages, refresh:
 
 watch(messages, messages => {
     messageLists.value = [...messages.sort((a,b) => +new Date(a.createdAt) - +new Date(b.createdAt)), ...messageLists.value]
-}, {
-    immediate: true
-})
-
-watch(box, box => {
-    if (box) {
-    setTimeout(() => {
-            box.scrollTo(0, 99999)
-        }, 500)
-    }
-})
+});
 
 const handleInputFile = ({target}) => {
     const allowed = ["png", "jpg", "jpeg", "webp"]
@@ -112,7 +102,7 @@ const handlePostMessage = async () => {
     let fd = new FormData();
     fd.append("content", content.value)
     fd.append("image", image.value)
-    const { data, error } = await sendMessage(chat._id ?? chat.user._id, fd);
+    const { data, error } = await sendMessage(chat._id, fd);
     pendingSendMessage.value = false;
     if (error.value) {
         error.value.data.errors.forEach(v => {
@@ -135,19 +125,21 @@ onMounted(() => {
     socket.value.emit("join-chat", chat._id);
     socket.value.on("new-message", message => messageLists.value.push(message));
     socket.value.on("delete-message", message => messageLists.value = messageLists.value.filter(v => v._id != message._id));
-    socket.value.on("readed-message", message => messageLists.value.find(v => v._id == message._id).isRead = true);
     useScroll(fetchPoint.value, () => {
         if (messageLists.value.length && messages.value.length >= limit.value && !pendingMessages.value) {
             skip.value += limit.value;
         }
     });
+    setTimeout(() => {
+        box.value.scrollTo(0, 999999)
+    }, 500)
 })
+
 
 onUnmounted(() => {
     socket.value.emit("leave-chat", chat._id);
     socket.value.off("new-message")
     socket.value.off("delete-message")
-    socket.value.off("readed-message");
 })
 </script>
 <style scoped>

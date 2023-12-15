@@ -5,6 +5,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
         if (user.authenticated) {
             if (!socket.value?.connected) {
                 socket.value?.connect();
+                socket.value.emit("join", user._id)
             }
         } else {
             socket.value?.disconnect();

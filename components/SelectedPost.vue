@@ -87,7 +87,7 @@
                     <SharedPost v-if="post.share" :post="post.share" />
                     <div class="px-2">
                         <i class="bx bx-like"></i> {{ post.likes.length }}
-                        <i class="bx bx-chat"></i> {{ post.totalComments }}
+                        <i class="bx bx-chat"></i> {{ post.comments }}
                     </div>
                     <div class="flex flex-row justify-between p-2 dark:border-white/10 border-y border-black/10">
                         <button class="action-post" @click="handleLikePost">
@@ -96,7 +96,7 @@
                             <i class='bx bx-like' v-else></i>
                             <span>Like</span>
                         </button>
-                        <button class="action-post">
+                        <button class="action-post" @click="$emit('sharePost', post._id)">
                             <i class='bx bx-share bx-flip-horizontal'></i>
                             <span>Share</span>
                         </button>
@@ -129,8 +129,8 @@
                             <i class="bx bx-camera"></i>
                         </label>
                         <input ref="inputImage" type="file" name="image" accept=".jpg,.jpeg,.png,.webp" id="imagesInput" class="hidden" @input="handleInputFile">
-                        <button class="flex justify-center items-center px-1 text-xl" @click="handlePostComment" :disabled="!comment.trim() || !image">
-                            <i class="bx" :class="{'bx-send': !comment.trim(), 'bxs-send': comment.trim()}"></i>
+                        <button class="flex justify-center items-center px-1 text-xl" @click="handlePostComment" :disabled="!comment.trim() && !image">
+                            <i class="bx" :class="{'bx-send': !comment.trim() && !image, 'bxs-send': comment.trim() || image}"></i>
                         </button>
                     </div>
                 </div>
@@ -159,7 +159,7 @@
 </template>
 <script setup>
 import moment from "moment";
-const emit = defineEmits(["deletePost", "likePost", "closeSelectedPost", "editPost", "bookmarkPost", "deleteBookmarkPost"]);
+const emit = defineEmits(["deletePost", "likePost", "closeSelectedPost", "editPost", "bookmarkPost", "deleteBookmarkPost", "sharePost", "updateComment"]);
 const { id } = defineProps(["id"]);
 const toast = useToast();
 const user = userStore();
@@ -206,6 +206,7 @@ const handleLikePost = async () => {
         toast.value.push("Something went wrong when liking post");
     } else {
         post.value.likes = like.value.likes
+        emit("likePost", like.value);
     }
 }
 
@@ -240,7 +241,7 @@ const handleDeletePost = async () => {
 }
 
 const handlePostComment = async () => {
-    if (!comment.value.trim()) return;
+    if (!comment.value.trim() && !image.value) return;
     pendingSendComment.value = true;
     let fd = new FormData();
     fd.append("comment", comment.value)
@@ -278,22 +279,24 @@ const escClick = ({code}) => {
     if (code == "Escape") emit("closeSelectedPost");
 }
 
-watch(post, val => {
-    if (val) {
-        socket.value.emit("join-post", val._id);
+watch(post, post => {
+    if (post) {
+        socket.value.emit("join-post", post._id);
     }
 })
 
 onMounted(() => {
     document.addEventListener("keydown", escClick)
     // socket.value.emit("join-post", post.value?._id);
-    socket.value.on("new-comment", comment => {
+    socket.value.on("new-comment", ({comment, post: updateComments}) => {
         comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply.push(comment) : comments.value.push(comment)
-        post.value.totalComments += 1
+        post.value.comments = updateComments.comments;
+        emit("updateComment", updateComments);
     });
-    socket.value.on("delete-comment", comment => {
+    socket.value.on("delete-comment", ({comment, post: updateComments}) => {
         comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply = comments.value.find(v => v._id == comment.replyId).reply.filter(v => v._id != comment._id) : comments.value = comments.value.filter(v => v._id != comment._id)
-        post.value.totalComments -= 1
+        post.value.comments = updateComments.comments;
+        emit("updateComment", updateComments);
     });
 
     if (descriptionContainer.value?.clientHeight < descriptionContainer.value?.scrollHeight) {

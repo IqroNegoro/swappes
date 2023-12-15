@@ -5,6 +5,10 @@ export default defineNuxtConfig({
     "@nuxtjs/tailwindcss",
     "@pinia/nuxt"
   ],
+  runtimeConfig: {
+    devApiUrl: process.env.DEV_API_URL,
+    apiUrl: process.env.API_URL,
+  },
   app: {
     pageTransition: { name: 'page', mode: 'out-in', appear: true },
     head: {

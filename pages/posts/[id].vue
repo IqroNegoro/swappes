@@ -66,7 +66,7 @@
                 </div>
                 <div class="px-2">
                     <i class="bx bx-like"></i> {{ post.likes.length }}
-                    <i class="bx bx-chat"></i> {{ post.totalComments }}
+                    <i class="bx bx-chat"></i> {{ post.comments }}
                 </div>
                 <div class="flex flex-row justify-between p-2 dark:border-white/10 border-y border-black/10">
                     <button class="action-post" @click="handleLikePost">
@@ -229,7 +229,7 @@ const handlePostComment = async () => {
     } else {
         if (!socket.value.connected) {
             comments.value.push(data.value)
-            post.value.totalComments++
+            post.value.comments++
         }
         divComment.value.innerHTML = "";
         comment.value = "";
@@ -270,12 +270,12 @@ onMounted(() => {
 
     socket.value.on("new-comment", comment => {
         comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply.push(comment) : comments.value.push(comment)
-        post.value.totalComments++
+        post.value.comments++
     });
 
     socket.value.on("delete-comment", comment => {
         comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply = comments.value.find(v => v._id == comment.replyId).reply.filter(v => v._id != comment._id) : comments.value = comments.value.filter(v => v._id != comment._id)
-        post.value.totalComments--
+        post.value.comments--
     });
 
     if (descriptionContainer.value.clientHeight < descriptionContainer.value.scrollHeight) {

@@ -1,5 +1,5 @@
 <template>
-    <div class="fixed bg-black/50 top-0 left-0 w-full h-screen flex justify-center items-center overflow-auto z-20" @click.self="$emit('closeCreatePostStatus')">
+    <div class="fixed bg-black/50 top-0 left-0 w-full h-screen flex justify-center items-center overflow-auto z-20" @click.self="$emit('closeEditPost')">
         <div class="rounded-md w-full md:w-1/2 dark:bg-dark-primary dark:text-white bg-white flex flex-col p-1 gap-1 relative">
             <SelectedPostSkeleton v-if="pendingPost" />
             <template v-else>
@@ -22,7 +22,11 @@
                 </div>
                 <div class="min-h-[8rem] max-h-96 overflow-y-auto overscroll-contain">
                     <div contenteditable="true" ref="textarea" class="outline-none px-2 mb-4 z-10 min-h-[8rem]" @input="({target}) => description = target.innerText">{{post.description}}</div>
-                    <SharedPost v-if="post.share" :post="post.share" />
+                    <SharedPost v-if="post.isShare && post.share" :post="post.share" />
+                    <div v-if="post.isShare && !post.share" class="flex flex-col justify-center items-center">
+                        <i class="bx bx-ghost bx-tada"></i>
+                        <h1>This share post has been deleted</h1>
+                    </div>
                     <div v-if="!post.share && totalImages" class="grid gap-1 rounded-xl overflow-hidden" :class="{'grid-cols-1 grid-rows-1': totalImages == 1, 'grid-cols-2 grid-rows-1': totalImages == 2, 'grid-cols-2 grid-rows-2': totalImages == 3, 'grid-cols-2 grid-rows-2': totalImages == 4}">
                         <div class="relative" v-for="(image, i) in oldImages" :key="i" :class="{'col-span-2': i == 0 && totalImages == 3}">
                             <button class="absolute dark:bg-dark-primary dark:text-white top-0 right-0 flex justify-center items-center px-1 bg-white rounded-full m-1" @click="oldImages.splice(i, 1)">

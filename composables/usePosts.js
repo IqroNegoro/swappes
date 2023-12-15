@@ -3,7 +3,7 @@ export const getPosts = async options => await useApi("posts", {
     lazy: true,
     transform: res => res.data,
     default: () => [],
-    key: "get-posts",
+    key: `get-posts-${options.params.skip.value}`
 })
 
 export const getPost = async (id, options) => await useApi(`posts/${id}`, {

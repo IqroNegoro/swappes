@@ -143,12 +143,12 @@
                 <PostSkeleton v-if="posts.length >= limit" />
             </div>
         </div>
-        <CreatePost v-if="createPostStatus" @new-post="post => postsList.unshift(post)" @close-create-post-status="createPostStatus = false" />
-        <EditPost v-if="editPost" :id="editPost" @updated-post="post => postsList.findIndex(v => v._id == post._id) >= 0 ? postsList.splice(postsList.findIndex(v => v._id == post._id), 1, {...post, share: postsList.find(v => v._id == post._id).share}) : ''" @close-edit-post="editPost = null" />
-        <SelectedPost v-if="showSelectedPost" :id="showSelectedPost" @delete-post="id => {posts = postsList.filter(v => v._id != id); showSelectedPost = null}" @close-selected-post="showSelectedPost = null" @edit-post="id => {editPost = id; showSelectedPost = null}" @bookmark-post="bookmark => postsList.find(v => v._id == bookmark.post).bookmark = bookmark" @delete-bookmark-post="bookmark => postsList.find(v => v.bookmark?._id == bookmark._id).bookmark = null" />
-        <SharePost v-if="sharePost" :id="sharePost" @close-share-status="sharePost = null" />
-        <ShowFriends v-if="showUserFriends" :id="id" :name="userData.name" @close-user-friends="showUserFriends = false" />
-        <ChatCreate v-if="chat" :id="chat" @close-create-chat="chat = null" />
+        <LazyCreatePost v-if="createPostStatus" @new-post="post => postsList.unshift(post)" @close-create-post-status="createPostStatus = false" />
+        <LazyEditPost v-if="editPost" :id="editPost" @updated-post="post => postsList.findIndex(v => v._id == post._id) >= 0 ? postsList.splice(postsList.findIndex(v => v._id == post._id), 1, {...post, share: postsList.find(v => v._id == post._id).share}) : ''" @close-edit-post="editPost = null" />
+        <LazySelectedPost v-if="showSelectedPost" :id="showSelectedPost" @delete-post="id => {posts = postsList.filter(v => v._id != id); showSelectedPost = null}" @close-selected-post="showSelectedPost = null" @like-post="likes => postsList.find(v => v._id == likes._id).likes = likes.likes" @edit-post="id => {editPost = id; showSelectedPost = null}" @bookmark-post="bookmark => postsList.find(v => v._id == bookmark.post).bookmark = bookmark" @delete-bookmark-post="bookmark => postsList.find(v => v.bookmark?._id == bookmark._id).bookmark = null" @share-post="id => sharePost = id" @update-comment="post => postsList.find(v => v._id == post._id).comments = post.comments" />
+        <LazySharePost v-if="sharePost" :id="sharePost" @close-share-status="sharePost = null" />
+        <LazyShowFriends v-if="showUserFriends" :id="id" :name="userData.name" @close-user-friends="showUserFriends = false" />
+        <LazyChatCreate v-if="chat" :id="chat" @close-create-chat="chat = null" />
     </div>
 </template>
 <script setup>

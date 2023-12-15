@@ -10,10 +10,6 @@
                 <p>{{message.content}}</p>
                 <div class="absolute bottom-0 right-0 m-1 mr-4 flex justify-center items-center gap-1">
                     <span class="text-xs">{{ moment(message.createdAt).format("LT") }}</span>
-                    <template v-if="user._id == message.user">
-                        <i v-if="message.isRead" class="bx bx-check-double text-blue-400"></i>
-                        <i v-else class="bx bx-check"></i>
-                    </template>
                 </div>
             </div>
         </div>
@@ -28,12 +24,4 @@ const point = ref(undefined);
 
 const { data, pending, error, execute } = await deleteMessage(message.chat, message._id);
 pending.value = false;
-
-onMounted(() => {
-    if (!message.isRead && user._id != message.user) {
-        useScroll(point.value, () => {
-            socket.value.emit("readed-message", message)
-        }, true)
-    }
-})
 </script>

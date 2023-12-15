@@ -89,7 +89,8 @@ const handlePost = async () => {
 
     const { data, error } = await createPost({
         description: description.value,
-        share: post.value._id
+        share: post.value._id,
+        isShare: true
     });
 
     pending.value = false;

@@ -27,43 +27,31 @@
 <script setup>
 const user = userStore();
 const selectedChat = ref(undefined);
-const message = ref("");
 const socket = useSocket();
 const container = ref(undefined);
 
 const { data: chats, pending: pendingChats, error: errorChat, refresh: refreshChat } = await getChats();
 
 onMounted(() => {
-    watch(selectedChat, async val => {
-        if (val?._id) {
-            container.value?.scrollTo(9999999, 0)
-        } else {
-            container.value?.scrollTo(0, 0)
-        }
-    })
     const audio = new Audio("/sfx/messages.mp3");
-    socket.value.emit("join-chat", user._id);
-    socket.value.on("new-chat", chat => {
+    socket.value.on("new-chat", async chat => {
         const old = chats.value.find(v => v._id == chat._id);
         if (old) {
             old.lastMessage = chat.lastMessage;
-            old.isRead = chat.isRead;
             old.updatedAt = chat.updatedAt;
             chats.value = chats.value.sort(v => v.updatedAt);
+            if (chat.lastMessage.user != user._id) audio.play();
         } else {
-            chats.value.unshift(chat);    
+            await refreshChat();
+            audio.play();
         }
-        if (chat.lastMessage.user != user._id) audio.play();
     });
-    socket.value.on("readed-messages", chat => {
-        chats.value.find(v => v._id == chat._id).lastMessage = chat.lastMessage
-    });
+    socket.value.on("delete-latest-message", message => chats.value.find(v => v._id == message.chat && v.lastMessage.message?._id == message._id) ? chats.value.find(v => v._id == message.chat && v.lastMessage.message._id == message._id).lastMessage.message = null : "");
 });
 
 onUnmounted(() => {
-    socket.value.emit("leave-chat");
     socket.value.off("new-chat");
-    socket.value.off("readed-messages");
+    socket.value.off("delete-latest-message")
 })
 
 definePageMeta({
