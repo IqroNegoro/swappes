@@ -18,7 +18,9 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     }
     
     if (data.value) {
-        console.log("data", data.value)
+        if (process.env.NODE_ENV === "development") {
+            console.log("data", data.value)
+        }
         user.$patch({
             ...data.value,
             authenticated: true
