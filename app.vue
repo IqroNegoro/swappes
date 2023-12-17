@@ -3,12 +3,14 @@
         <NuxtPage />
         <NuxtLoadingIndicator />
         <Notification v-if="notification._id" />
+        <Setting v-if="isSetting" />
         <Toast />
     </NuxtLayout>
 </template>
 <script setup>
 const toast = useToast();
 const notification = useNotification();
+const isSetting = settingStatus();
 const user = userStore();
 const socket = useSocket();
 

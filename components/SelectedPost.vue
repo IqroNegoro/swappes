@@ -287,7 +287,7 @@ watch(post, post => {
 
 onMounted(() => {
     document.addEventListener("keydown", escClick)
-    // socket.value.emit("join-post", post.value?._id);
+    
     socket.value.on("new-comment", ({comment, post: updateComments}) => {
         comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply.push(comment) : comments.value.push(comment)
         post.value.comments = updateComments.comments;

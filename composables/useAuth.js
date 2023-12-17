@@ -35,5 +35,5 @@ export const logout = async () => {
     user.$reset();
     socket.value?.disconnect();
     toast.value.push("Logout Success")
-    return navigateTo("/login");
+    return await navigateTo("/login");
 };

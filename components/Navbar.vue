@@ -53,6 +53,13 @@
                         </div>
                         <i class="bx bx-chevron-right text-3xl opacity-0 group-hover:opacity-100 group-hover:translate-x-2 duration-150"></i>
                     </NuxtLink>
+                    <button class="group hover:bg-dark-secondary dark:text-inherit w-full text-black p-2 rounded-md flex justify-between items-center" @click="isSetting = true">
+                        <div class="flex justify-center items-center flex-row gap-4">
+                            <i class="bx bxs-cog text-2xl"></i>
+                            Settings
+                        </div>
+                        <i class="bx bx-chevron-right text-3xl opacity-0 group-hover:opacity-100 group-hover:translate-x-2 duration-150"></i>
+                    </button>
                     <button class="group hover:bg-dark-secondary dark:text-inherit w-full text-black p-2 rounded-md flex justify-between items-center" @click="logout">
                         <div class="flex justify-center items-center flex-row gap-4">
                             <i class='bx bx-log-out text-2xl'></i>
@@ -70,6 +77,7 @@ const user = userStore();
 const notification = useNotification();
 const showNotificationsMenu = ref(false);
 const showUserMenu = ref(false);
+const isSetting = settingStatus();
 
 const {data: notifications, error: errorNotification, pending: pendingNotification, execute: executeNotification} = await getNotifications();
 

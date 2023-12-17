@@ -71,7 +71,7 @@
                 <div class="flex flex-row justify-between p-2 dark:border-white/10 border-y border-black/10">
                     <button class="action-post" @click="handleLikePost">
                         <i class='bx bx-loader-alt bx-spin' v-if="pendingLike"></i>
-                        <i class='bx bxs-like text-blue-500' v-else-if="post.likes.find(v => v._id == user._id)"></i>
+                        <i class='bx bxs-like text-blue-500' v-else-if="post.likes.find(v => v == user._id)"></i>
                         <i class='bx bx-like' v-else></i>
                         <span>Like</span>
                     </button>
@@ -182,8 +182,7 @@ const handleDeletePost = async () => {
         toast.value.push("Something Wrong");
     } else {
         toast.value.push("Success Delete Post");
-        emit("deletePost", delPost.value.post._id)
-        emit("closeSelectedPost")
+        return await navigateTo("/");
     }
 }
 
@@ -264,18 +263,15 @@ useHead({
 })
 
 onMounted(() => {
-    if (!rooms.has(id)) {
-        socket.value.emit("join-post", id);
-    }
-
-    socket.value.on("new-comment", comment => {
+    socket.value?.emit("join-post", post.value._id);
+    socket.value.on("new-comment", ({comment, post: updateComments}) => {
         comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply.push(comment) : comments.value.push(comment)
-        post.value.comments++
+        post.value.comments = updateComments.comments;
     });
 
-    socket.value.on("delete-comment", comment => {
+    socket.value.on("delete-comment", ({comment, post: updateComments}) => {
         comment.replyId ? comments.value.find(v => v._id == comment.replyId).reply = comments.value.find(v => v._id == comment.replyId).reply.filter(v => v._id != comment._id) : comments.value = comments.value.filter(v => v._id != comment._id)
-        post.value.comments--
+        post.value.comments = updateComments.comments;
     });
 
     if (descriptionContainer.value.clientHeight < descriptionContainer.value.scrollHeight) {
