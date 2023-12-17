@@ -4,8 +4,8 @@
             <div v-if="bookmark.post.images.length" class="w-24 h-24 md:w-48 md:h-36 rounded-md overflow-hidden grid gap-1" :class="{'grid-cols-1 grid-rows-1': bookmark.post.images.length == 1, 'grid-cols-2 grid-rows-1': bookmark.post.images.length == 2, 'grid-cols-2 grid-rows-2': bookmark.post.images.length == 3, 'grid-cols-2 grid-rows-2': bookmark.post.images.length == 4}">
                 <img v-for="(images, i) in bookmark.post.images" :key="images.discordId" :src="images.images" alt="attachments" class="w-full h-full overflow-hidden cursor-pointer object-cover object-top" :class="{'aspect-square max-h-96': bookmark.post.images.length > 1, 'col-span-2 object-center': i == 0 && bookmark.post.images.length == 3}" loading="lazy">
             </div>
-            <img v-else :src="bookmark.post?.user?.avatar?.url" :alt="bookmark.post?.user?.name" class="w-24 h-24 md:w-48 md:h-36 rounded-sm bg-dark-secondary object-cover object-center">
-            <!-- <div v-else class="w-48 h-24 rounded-sm bg-dark-secondary"></div> -->
+            <img v-else-if="bookmark.post?.user?.avatar?.url" :src="bookmark.post?.user?.avatar?.url" :alt="bookmark.post?.user?.name" class="w-24 h-24 md:w-48 md:h-36 rounded-sm bg-dark-secondary object-cover object-center">
+            <div v-else class="w-24 h-24 md:w-48 md:h-36 rounded-sm bg-dark-secondary"></div>
             <div class="flex flex-col justify-between gap-3 h-full">
                 <div class="flex flex-col gap-2">
                     <h1 class="font-semibold truncate">
@@ -17,7 +17,8 @@
                     </span>
                 </div>
                 <NuxtLink :to="{name: 'users-id', params: {id: bookmark.post?.user?._id}}" class="flex flex-row gap-4 justify-start items-center">
-                    <img :src="bookmark.post?.user?.avatar?.url" :alt="bookmark.post?.user?.name" class="w-8 h-8 rounded-full aspect-square object-cover">
+                    <img v-if="bookmark.post?.user?.avatar?.url" :src="bookmark.post?.user?.avatar?.url" :alt="bookmark.post?.user?.name" class="w-8 h-8 rounded-full aspect-square object-cover">
+                    <div v-else class="rounded-full w-10 h-10 bg-dark-secondary"></div>
                     <p class="font-semibold"> {{ bookmark.post?.user?.name }} </p>
                 </NuxtLink>
             </div>

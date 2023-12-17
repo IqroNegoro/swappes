@@ -3,7 +3,8 @@
         <div class="flex justify-between px-4 pt-2">
             <div class="flex gap-2">
                 <NuxtLink :to="{name: 'users-id', params: {id: post.user._id}}">
-                    <img :src="post.user.avatar?.url" alt="" class="rounded-full w-10 h-10 object-cover"> 
+                    <img v-if="post.user.avatar?.url" :src="post.user.avatar?.url" alt="" class="rounded-full w-10 h-10 object-cover"> 
+                    <div v-else class="rounded-full w-10 h-10 bg-dark-secondary"></div>
                 </NuxtLink>
                 <div>
                     <NuxtLink :to="{name: 'users-id', params: {id: post.user._id}}" class="text-sm font-bold">{{ post.user.name }}</NuxtLink>

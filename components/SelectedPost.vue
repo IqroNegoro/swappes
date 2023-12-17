@@ -24,7 +24,8 @@
                     <div class="flex justify-between px-4 pt-2">
                         <div class="flex gap-2">
                             <NuxtLink :to="{name: 'users-id', params: {id: post.user._id}}">
-                                <img :src="post.user.avatar?.url" alt="" class="rounded-full w-10 h-10 object-cover"> 
+                                <img v-if="post.user.avatar?.url" :src="post.user.avatar?.url" alt="" class="rounded-full w-10 h-10 object-cover"> 
+                                <div v-else class="rounded-full w-10 h-10 bg-dark-secondary"></div>
                             </NuxtLink>
                             <div>
                                 <NuxtLink :to="{name: 'users-id', params: {id: post.user._id}}" class="text-sm font-bold">{{ post.user.name }}</NuxtLink>
@@ -122,7 +123,8 @@
                 </div>
                 <div class="relative w-full rounded-md shadow-sm p-4 gap-4 flex justify-center items-center flex-nowrap">
                     <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-20" v-if="pendingSendComment"></div>
-                    <img :src="user.avatar?.url" alt="" class="rounded-full w-8 h-8 object-cover aspect-square">
+                    <img v-if="user.avatar?.url" :src="user.avatar?.url" alt="" class="rounded-full w-8 h-8 object-cover aspect-square">
+                    <div v-else class="rounded-full w-10 h-10 aspect-square bg-dark-secondary"></div>
                     <div ref="divComment" contenteditable="true" placeholder="Write your comment..." class="min-h-[40px] max-h-48 overflow-y-auto cursor-pointer rounded-lg w-full text-left bg-black/10 px-4 py-2 font-light outline-none" @input="({target}) => comment = target.innerText" @keydown.ctrl.enter="handlePostComment" autofocus></div>
                     <div class="flex">
                         <label for="imagesInput" class="cursor-pointer flex justify-center items-center px-1 text-xl">

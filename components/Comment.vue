@@ -2,7 +2,8 @@
     <div class="flex flex-col gap-2 w-full" ref="container">
         <div class="flex flex-row gap-2">
             <NuxtLink :to="{name: 'users-id', params: {id: comment.user._id}}">
-                <img :src="comment.user.avatar?.url" class="w-10 h-10 object-cover rounded-full">
+                <img v-if="comment.user.avatar?.url" :src="comment.user.avatar?.url" class="w-10 h-10 object-cover rounded-full">
+                <div v-else class="rounded-full w-10 h-10 bg-dark-secondary"></div>
             </NuxtLink>
             <div class="flex flex-col gap-1">
                 <div class="dark:bg-dark-secondary rounded-md bg-black/10 px-2 py-1">

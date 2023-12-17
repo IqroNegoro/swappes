@@ -123,7 +123,8 @@
             </div>
             <div class="grid grid-cols-1 grid-flow-row gap-2 dark:bg-dark-primary">
                 <div class="rounded-md shadow-sm p-4 flex gap-4 dark:bg-dark-primary mt-2" v-if="user.authenticated && user._id == userData._id">
-                    <img :src="user.avatar?.url" alt="" class="rounded-full w-12 h-12 object-cover aspect-square">
+                    <img v-if="user.avatar?.url" :src="user.avatar?.url" alt="" class="rounded-full w-12 h-12 object-cover aspect-square">
+                    <div v-else class="rounded-full w-12 h-12 bg-dark-secondary"></div>
                     <button class="dark:text-white dark:bg-dark-secondary rounded-full w-full text-left bg-black/10 px-4 font-light outline-none" @click="createPostStatus = true">
                         Create post...
                     </button>
