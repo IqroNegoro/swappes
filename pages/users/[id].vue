@@ -106,7 +106,7 @@
             </div>
         </div>
         <div class="dark:text-white dark:bg-dark w-full mt-4 rounded-md lg:w-1/2 grid grid-cols-1 grid-flow-row gap-2 bg-white">
-            <div class="w-full mx-auto rounded-md shadow-sm p-4 dark:text-white dark:bg-dark-primary bg-white">
+            <div class="w-full mx-auto rounded-sm shadow-sm p-4 dark:text-white dark:bg-dark-primary bg-white">
                 <div class="flex p-2 justify-between">
                     <h1 class="text-xl font-semibold">Friends</h1>
                     <button class="text-lg font-semibold" v-if="friends.length" @click="showUserFriends = true">See All Friends</button>
@@ -121,7 +121,7 @@
                     <h1>This user doesn't have friends, be the first one!</h1>
                 </div>
             </div>
-            <div class="grid grid-cols-1 grid-flow-row gap-2 dark:bg-dark-primary">
+            <div class="grid grid-cols-1 grid-flow-row gap-2">
                 <div class="rounded-md shadow-sm p-4 flex gap-4 dark:bg-dark-primary mt-2" v-if="user.authenticated && user._id == userData._id">
                     <img v-if="user.avatar?.url" :src="user.avatar?.url" alt="" class="rounded-full w-12 h-12 object-cover aspect-square">
                     <div v-else class="rounded-full w-12 h-12 bg-dark-secondary"></div>

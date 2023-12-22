@@ -13,6 +13,10 @@
         @apply bg-black/50;
     }
 
+    * {
+        @apply overscroll-contain
+    }
+
     html {
         font-family: 'Poppins', 'Roboto', sans-serif;
         -webkit-tap-highlight-color: transparent;

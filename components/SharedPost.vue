@@ -1,9 +1,10 @@
 <template>
-    <div class="flex flex-col gap-4 border rounded-md mx-2">
+    <div class="flex flex-col gap-4 rounded-md mx-2 dark:bg-dark">
         <div class="flex items-center gap-2 px-1">
-            <NuxtLink :to="{name: 'users-id', params: {id: post.user._id}}">
+            <NuxtLink v-if="post.user.avatar?.url" :to="{name: 'users-id', params: {id: post.user._id}}">
                 <img :src="post.user.avatar?.url" alt="" class="rounded-full w-8 h-8 object-cover"> 
             </NuxtLink>
+            <div v-else class="rounded-full w-8 h-8 bg-dark-secondary"></div>
             <div>
                 <NuxtLink :to="{name: 'users-id', params: {id: post.user._id}}" class="text-sm font-bold">{{ post.user.name }}</NuxtLink>
                 <p class="text-xs">{{ moment(post.createdAt).fromNow() }} &bull; <i class='bx bx-world'></i></p>
@@ -17,9 +18,9 @@
                 Read More...
             </button>
         </div>
-        <div class="grid gap-1" :class="{'grid-cols-1 grid-rows-1': post.images.length == 1, 'grid-cols-2 grid-rows-1': post.images.length == 2, 'grid-cols-2 grid-rows-2': post.images.length == 3, 'grid-cols-2 grid-rows-2': post.images.length == 4}">
+        <div class="grid gap-1 rounded-xl" :class="{'grid-cols-1 grid-rows-1': post.images.length == 1, 'grid-cols-2 grid-rows-1': post.images.length == 2, 'grid-cols-2 grid-rows-2': post.images.length == 3, 'grid-cols-2 grid-rows-2': post.images.length == 4}">
             <div v-for="(images, i) in post.images" :key="images.discordId" :class="{'col-span-2': i == 0 && post.images.length == 3}">
-                <img :src="images.images" alt="attachments" class="w-full overflow-hidden" :class="{'aspect-square object-cover object-top': post.images.length > 1, 'col-span-2 h-64': i == 0 && post.images.length == 3}" loading="lazy">
+                <img :src="images.images" alt="attachments" class="w-full overflow-hidden rounded-sm" :class="{'aspect-square object-cover object-top': post.images.length > 1, 'col-span-2 h-64': i == 0 && post.images.length == 3}" loading="lazy">
             </div>
         </div>
     </div>

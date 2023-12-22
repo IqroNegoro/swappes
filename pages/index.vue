@@ -1,5 +1,5 @@
 <template>
-    <div class="grid grid-cols-1 grid-flow-row gap-2 dark:bg-dark-primary">
+    <div class="grid grid-cols-1 grid-flow-row gap-2">
         <div class="rounded-md shadow-sm p-4 flex gap-4 dark:bg-dark-primary mt-2">
             <img v-if="user.avatar?.url" :src="user.avatar?.url" alt="" class="rounded-full w-12 h-12 object-cover aspect-square">
             <div v-else class="rounded-full w-10 h-10 bg-dark-secondary"></div>

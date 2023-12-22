@@ -1,10 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: [
-    "@nuxtjs/tailwindcss",
-    "@pinia/nuxt"
-  ],
+  modules: ["@nuxtjs/tailwindcss", "@pinia/nuxt"],
   runtimeConfig: {
     devApiUrl: process.env.DEV_API_URL,
     apiUrl: process.env.API_URL,

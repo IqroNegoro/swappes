@@ -21,6 +21,7 @@ const handleStatus = e => {
         toast.value.push("Internet connection restored")
     }
 }
+
 onMounted(() => {
     window.addEventListener("offline", handleStatus)
     window.addEventListener("online", handleStatus)
