@@ -14,7 +14,7 @@
     }
 
     * {
-        @apply overscroll-contain
+        @apply overscroll-contain outline-none
     }
 
     html {

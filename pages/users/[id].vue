@@ -62,7 +62,7 @@
                         </div>
                     </Transition>
                 </div>
-                <h1 class="text-xl mt-8 ">{{userData.name}}</h1>
+                <h1 class="text-xl mt-8">{{userData.name}}</h1>
             </div>
             <div class="max-md:-translate-y-28 flex flex-col gap-2">
                 <NuxtLink :to="{name: 'login'}" class="text-center flex justify-center items-center gap-2 px-4 py-2 bg-black/50 hover:bg-black/75 transition-all duration-300 text-white dark:bg-dark-secondary mx-auto rounded-md" v-if="!user.authenticated">

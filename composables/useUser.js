@@ -16,7 +16,7 @@ export const getUserPosts = async (id, options) => await useApi(`users/${id}/pos
 export const uploadAvatar = async avatar => await useApi(`users/avatar`, {
     method: "POST",
     transform: res => res.data,
-    default: () => [],
+    default: () => {},
     body: avatar,
     key: "upload-user-avatar"
 })
@@ -24,9 +24,17 @@ export const uploadAvatar = async avatar => await useApi(`users/avatar`, {
 export const uploadBanner = async banner => await useApi(`users/banner`, {
     method: "POST",
     transform: res => res.data,
-    default: () => [],
+    default: () => {},
     body: banner,
     key: "upload-user-banner"
+})
+
+export const updateProfile = async profile => await useApi(`users/update`, {
+    method: "PUT",
+    transform: res => res.data,
+    default: () => {},
+    body: profile,
+    key: "update-user-profile"
 })
 
 export const getUserFriends = async (id, options) => await useApi(`users/${id}/friends`, {
