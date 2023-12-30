@@ -36,7 +36,6 @@
                 <div class="w-full h-6 rounded-sm skeleton"></div>
             </div>
             <div v-else class="flex flex-row justify-center items-center flex-nowrap relative w-full">
-                <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-20" v-if="pendingSendMessage"></div>
                 <div ref="divComment" contenteditable="true" placeholder="Write your message..." class="min-h-[40px] max-h-48 overflow-y-auto cursor-pointer rounded-lg w-full text-left bg-black/10 px-4 py-2 font-light outline-none" @input="({target}) => content = target.innerText" @keydown.ctrl.enter="handlePostMessage"></div>
                 <div class="flex">
                     <label for="imagesInput" class="cursor-pointer flex justify-center items-center px-1 text-xl">
@@ -49,6 +48,7 @@
                     </button>
                 </div>
             </div>
+            <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-20" v-if="pendingSendMessage"></div>
         </div>
     </div>
 </template>

@@ -4,14 +4,14 @@
             <i v-if="pending" class="bx bx-loader-alt bx-spin"></i>
             <i v-else class="bx bx-trash"></i>
         </button>
-        <div class="bg-dark-secondary rounded-md w-full">
-            <img v-if="message.image" :src="message.image.url" alt="">
-            <div class="relative pr-24 pl-4 py-2 max-md:text-sm">
+        <div class="relative bg-dark-secondary rounded-md w-full">
+            <img v-if="message.image" :src="message.image.url" :alt="message.content" class="rounded-md">
+            <div v-if="message.content" class="relative pr-24 pl-4 py-2 max-md:text-sm">
                 <p>{{message.content}}</p>
+            </div>
                 <div class="absolute bottom-0 right-0 m-1 mr-4 flex justify-center items-center gap-1">
                     <span class="text-xs">{{ moment(message.createdAt).format("LT") }}</span>
                 </div>
-            </div>
         </div>
     </div>
 </template>
