@@ -3,8 +3,10 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ["@nuxtjs/tailwindcss", "@pinia/nuxt"],
   runtimeConfig: {
-    devApiUrl: process.env.DEV_API_URL,
-    apiUrl: process.env.API_URL,
+    public: {
+      devApiUrl: process.env.DEV_API_URL,
+      apiUrl: process.env.API_URL,
+    }
   },
   app: {
     pageTransition: { name: 'page', mode: 'out-in', appear: true },

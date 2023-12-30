@@ -2,7 +2,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     if (process.client) {
         document.documentElement.classList.add("dark")
     }
-
+    
     let { data, error } = await useApi("info", {
         key: "info",
     })
@@ -18,7 +18,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         socket.value?.disconnect();
         if (to.name != "login" && from.name != "login") return await navigateTo("/login");
     }
-    
+
     if (data.value) {
         if (process.env.NODE_ENV === "development") {
             console.log("data", data.value)
